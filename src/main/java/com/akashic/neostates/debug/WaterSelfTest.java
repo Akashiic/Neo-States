@@ -363,6 +363,60 @@ public final class WaterSelfTest {
             }
         }
 
+        // 11c'. an arrow in water keeps 0.6 of its motion a tick (and falls 0.05)
+        if (NeoConfig.modernWaterPhysics) {
+            x = this.bx + 6;
+            z = this.bz + 2;
+            if (w.getBlock(x, this.by + 4, z) == Blocks.water) {
+                net.minecraft.entity.projectile.EntityArrow arrow = new net.minecraft.entity.projectile.EntityArrow(
+                    w,
+                    x + 0.5D,
+                    this.by + 5.5D,
+                    z + 0.5D);
+                arrow.motionX = 0.0D;
+                arrow.motionY = -1.0D;
+                arrow.motionZ = 0.0D;
+                arrow.onUpdate();
+                check(
+                    "flecha na água guarda 0.6 do movimento (ficou em " + String.format("%.3f", arrow.motionY) + ")",
+                    Math.abs(arrow.motionY + 0.65D) < 0.01D);
+            }
+        }
+
+        // 11c''. a floating item goes with the current: a channel of still blocks with falling levels
+        if (NeoConfig.floatingItems && NeoConfig.modernWaterPhysics) {
+            clear(true);
+            z = this.bz + 4;
+            for (int i = 0; i < 7; i++) {
+                w.setBlock(this.bx + 1 + i, y, z, Blocks.water, i, 2);
+                w.setBlock(this.bx + 1 + i, y, z - 1, Blocks.glass, 0, 2);
+                w.setBlock(this.bx + 1 + i, y, z + 1, Blocks.glass, 0, 2);
+            }
+            w.setBlock(this.bx, y, z, Blocks.glass, 0, 2);
+            w.setBlock(this.bx + 8, y, z, Blocks.glass, 0, 2);
+            net.minecraft.entity.item.EntityItem drifter = new net.minecraft.entity.item.EntityItem(
+                w,
+                this.bx + 2.5D,
+                y + 0.5D,
+                z + 0.5D,
+                new ItemStack(Items.stick));
+            drifter.motionX = 0.0D;
+            drifter.motionY = 0.0D;
+            drifter.motionZ = 0.0D;
+            double startX = drifter.posX;
+            double fastest = 0.0D;
+            for (int tick = 0; tick < 30; tick++) {
+                drifter.onUpdate();
+                fastest = Math.max(fastest, drifter.motionX);
+            }
+            check(
+                "item boiando é levado pela correnteza (andou " + String.format("%.2f", drifter.posX - startX)
+                    + ", pico "
+                    + String.format("%.3f", fastest)
+                    + " por tick)",
+                drifter.posX - startX > 2.0D && Math.abs(drifter.posZ - (z + 0.5D)) < 0.3D);
+        }
+
         // 11d. out of the water the air comes back 4 a tick
         if (NeoConfig.modernAirRecovery) {
             clear(true);

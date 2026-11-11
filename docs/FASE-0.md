@@ -190,7 +190,9 @@ estruturas geradas dentro d'água devem nascer waterlogged; se o `waterSourceCon
 
 | 9 | itens e orbes de experiência boiam; o ar volta aos poucos, com as bolhas na tela; trilhos contêm água e a corrente não os arranca |
 
-O que foi verificado até a Fase 9:
+| 10 | entrega: build automático, histórico, [ENTREGA.md](ENTREGA.md); arrasto da flecha na água; pesca completa em água dentro de blocos |
+
+O que foi verificado até a Fase 10:
 
 * build e 28 testes;
 * servidor de desenvolvimento (Forge, Java 21) sobe até `Done` com o mod;
@@ -217,7 +219,7 @@ O que foi verificado até a Fase 9:
 * **Fase 9**: 52 verificações no Crucible, com o Et Futurum e o Galacticraft; item boiando e barra de ar vistos no
   cliente do pack.
 
-Continuam **[A VERIFICAR]**: mordida e fisgada em água hospedada, um plugin de proteção de verdade, shaders, biomas com cor própria, os plugins e o proxy.
+Continuam **[A VERIFICAR]**: o AkashicFishing em água hospedada, um plugin de proteção de verdade, shaders, biomas com cor própria, os plugins e o proxy.
 
 ## Ordem proposta
 

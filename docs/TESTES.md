@@ -331,6 +331,27 @@ servidor de desenvolvimento. As novas:
 Não testado em jogo: item levado por uma correnteza, orbe na água com jogador por perto (o jogador o atrai), trilho
 com água desenhado e com carrinho passando.
 
+## Fase 10: entrega (2026-11-11)
+
+Neo States `0.1.0-alpha.10`, com as mesmas builds do Player Backport e do Kunftig. Os dois plugins de teste estão em
+`tools/testplugins/`.
+
+| Verificação | Resultado |
+|---|---|
+| Autoteste no Crucible | 54 verificações, `RESULTADO: PASSOU` |
+| Flecha na água guarda 0,6 do movimento | `-1,000 -> -0,650` num tick (0,6 e a gravidade de 0,05) |
+| Item boiando é levado pela correnteza (autoteste, canal com níveis caindo) | andou 4,75 blocos em 30 ticks, pico 0,258 por tick |
+| Pesca em água normal (vara vanilla, anzol do Kunftig, cliente do pack) | `FISHING`, `LURED`, `BITE`, `CAUGHT_FISH` |
+| Pesca com o anzol sobre laje com água | os mesmos quatro eventos, anzol em Y 63,90 (a superfície é 63,89), bloco `STEP` |
+| Trilho com água, carrinho ao lado | o trilho fica, a água é desenhada na célula dele ([imagem](evidencias/fase-10/trilho-com-agua.jpg)) |
+| Cliente do pack sobe com a build | passou |
+
+Tentei medir o item na correnteza em jogo com funis sob o canal e `/testforblock`; a consulta de NBT do 1.7.10 exige
+a lista de itens idêntica e o método não deu leitura confiável, então a medida ficou no autoteste (mesma física, no
+servidor).
+
+Não testado: carrinho andando por um trilho com água; o AkashicFishing por cima do Kunftig.
+
 ## Não executado até aqui
 
 Das Fases 1 e 2:

@@ -41,6 +41,8 @@ public final class WaterPhysics {
     public static final double FLOAT_DRAG = 0.99F;
     /** {@code ExperienceOrb}: its eyes, above its feet ({@code 0.85} of a height of 0.5). */
     public static final double ORB_EYES = 0.425D;
+    /** {@code AbstractArrow#getWaterInertia}. */
+    public static final float ARROW_WATER_INERTIA = 0.6F;
     /** {@code LivingEntity#increaseAirSupply}. */
     public static final int AIR_REGAIN = 4;
 

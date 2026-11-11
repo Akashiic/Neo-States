@@ -43,6 +43,7 @@ public class NeoStatesCore implements IFMLLoadingPlugin, IEarlyMixinLoader {
         mixins.add("common.MixinEntityXPOrb_Float");
         mixins.add("common.MixinEntityLivingBase_Air");
         mixins.add("common.MixinBlockDynamicLiquid_Holders");
+        mixins.add("common.MixinEntityArrow_Water");
         if (FMLLaunchHandler.side()
             .isClient()) {
             mixins.add("client.MixinBlockLiquid_GrayIcon");

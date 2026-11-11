@@ -196,7 +196,7 @@ tem de ter o mesmo valor nos dois lados.
 | I-5 | Trilhos | a água corrente os arranca | aceitam uma fonte; a corrente não entra na célula | portado (com `waterlogging`) |
 | I-6 | Item na lava | queima | boia (0,95 horizontal) e queima, salvo os imunes | não portado; fica o do Et Futurum |
 | I-7 | Barco | física do 1.7.10 | reescrito no 1.9 | fora do escopo |
-| I-8 | Flecha na água | arrasto 0,8 | arrasto 0,6 | não portado |
+| I-8 | Flecha na água | guarda 0,8 do movimento por tick | guarda 0,6 (`AbstractArrow.getWaterInertia`) | portado na Fase 10 (`modernWaterPhysics`) |
 
 Um item ou orbe parado sobe até 0,0005 × 0,98 ÷ 0,02 = 0,0245 bloco por tick.
 

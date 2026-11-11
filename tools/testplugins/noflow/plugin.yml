@@ -1,0 +1,6 @@
+name: NoFlow
+main: noflow.NoFlow
+version: 1.0
+commands:
+  noflow:
+    description: test

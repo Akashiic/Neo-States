@@ -35,7 +35,7 @@ antes de usar um método mais novo que o 1.
 | Mod | Para quê | Estado |
 |---|---|---|
 | Akashic Player Backport | as condições de nadar e rastejar também valem em água dentro de blocos (`isWaterAt`, `surfaceY`) | os dois sobem juntos no TEOF 5.4 e o contrato dos três `0.8` continua; nadar dentro de lajes com jogador real: **[A VERIFICAR]** |
-| Kunftig | o anzol pergunta a superfície (`surfaceY`) antes da checagem vanilla | verificado em jogo: a boia fica na superfície sobre lajes com água ([imagem](evidencias/fase-7/pesca-boia-na-superficie.jpg)); mordida e fisgada nessa água: **[A VERIFICAR]** |
+| Kunftig | o anzol pergunta a superfície (`surfaceY`) antes da checagem vanilla | verificado em jogo: a boia fica na superfície sobre lajes com água ([imagem](evidencias/fase-7/pesca-boia-na-superficie.jpg)), e isca, mordida e fisgada acontecem nessa água (Fase 10) |
 
 ## O que a API não faz
 
