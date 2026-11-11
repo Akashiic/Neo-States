@@ -128,6 +128,7 @@ qualquer fazenda que conte com mobs afundando. Por isso a proposta é jogador pr
 | G-8 | `water_overlay` em vidro e folhas | não existe | sim | portar depois **[A VERIFICAR com o Angelica]** |
 | G-9 | Verso do topo | sempre uma face | `shouldRenderBackwardUpFace` | portar depois |
 | G-10 | FOV submerso | `× 60/70` | escalado por `fovEffectScale` | não portar |
+| G-11 | Luz dentro d'água | a água tira 3 de luz por bloco | tira 1 | portar: visto no teste do pack ([TESTES.md](TESTES.md)); o Hodgepodge já tem `useLighterWater` |
 
 ## H. Coluna de bolhas
 

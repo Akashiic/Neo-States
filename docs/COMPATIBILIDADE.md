@@ -8,7 +8,11 @@ EndlessIDs 1.7.4, FluidLogged 0.2.0 (jars `-sources` dos Mavens da GTNH e da Fal
 e os repositórios BelowCore, Akashic Player Backport, Kunftig, YesSteveModel, VitaGenesis e AkashicFishing no estado
 desta sessão.
 
-**[A VERIFICAR]** a lista e as versões exatas do TEOF em produção. Os documentos dos outros repositórios citam números
+**Conferido no TEOF 5.4** (ver [TESTES.md](TESTES.md)): Angelica 2.2.43, Hodgepodge 2.7.219, Et Futurum Requiem
+2.6.64-GTNH, GTNHLib 0.11.54, ChunkAPI 0.8.4, EndlessIDs 1.7.4 com `extendBlockItem=true`; sem FluidLogged. Os mixins
+lidos aqui são os de Hodgepodge 2.7.189 e Et Futurum 2.6.59: **[A VERIFICAR]** o que mudou até as versões do pack.
+
+Nota antiga: Os documentos dos outros repositórios citam números
 diferentes (Angelica 2.2.37 e 2.2.43; Hodgepodge 2.7.189 e 2.7.219; Et Futurum 2.6.59 no servidor e 2.6.64 no cliente;
 GTNHLib 0.11.40 e 0.11.51; "TEOF 4.1" e "TEOF 5.3").
 

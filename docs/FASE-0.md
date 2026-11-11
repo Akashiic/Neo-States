@@ -183,8 +183,10 @@ O que foi verificado até a Fase 2:
 * cliente de desenvolvimento (Java 8, sem tela, renderização por software) sobe até o menu: o mixin de `BlockLiquid`
   aplica e os dois sprites em cinza carregam (16×512 e 32×1024, 32 quadros cada).
 
-O que **não** foi verificado: nada foi visto dentro de um mundo. A cor da água, a névoa e a textura animada em jogo,
-com e sem Angelica e com shaders, continuam **[A VERIFICAR]**, assim como o Crucible e o pack real.
+* **pack real**: cliente TEOF 5.4 (Angelica 2.2.43, sem shaders) conectado ao Crucible do dono, com água e névoa
+  vistas dentro do mundo. Registro completo, achados e o que não foi executado em [TESTES.md](TESTES.md).
+
+Continuam **[A VERIFICAR]**: shaders, biomas com cor própria, os plugins e o proxy.
 
 ## Ordem proposta
 
