@@ -162,6 +162,14 @@ Decisão do dono: isso mora no **Akashic Player Backport**; o Neo States pode se
 O que **não** se porta: o motor `FlowingFluid` inteiro, a tabela de níveis, o vetor de fluxo, o arraste (já é do
 Player Backport), bolhas e itens flutuando (já são do Et Futurum).
 
+### Estado (Fase 6)
+
+Portados e ligados por `modernWaterPhysics`: A-5, A-6, A-7, C-1, C-2, C-4, C-5, C-6, D-3, D-5, D-7. Portado e ligado
+por `modernWaterLight`: G-11. Continuam de fora: B-4, E-6, E-8 (além do caso hospedado), G-8, G-9.
+
+O empurrão de um jogador depende de a física rodar no cliente (no 1.7.10 o cliente é quem move o jogador): a opção
+tem de ter o mesmo valor nos dois lados.
+
 ### Como o empurrão fiel convive com o Et Futurum
 
 O Et Futurum (`adjustedLiquidPhysics`, ligado por padrão) injeta **dentro** de `World.handleMaterialAcceleration`.

@@ -9,7 +9,7 @@ servidor Crucible em Java 21, clientes em Java 8. Começa pela água, em três c
 | B, física | leitura unificada de altura, movimento do jogador na água |
 | C, estado | waterlogging: blocos parciais com água na mesma célula |
 
-**Estado: Fase 5.** Há a API de leitura de fluido, a Camada A (textura em cinza, cor por bioma, névoa submersa) e os
+**Estado: Fase 6.** Há a API de leitura de fluido, a Camada A (textura em cinza, cor por bioma, névoa submersa) e os
 Camada C até o comportamento: lajes, escadas, cercas, muros, painéis, alçapões, escadas de mão, placas e baús podem
 conter água (inclusive em Y < 0), com balde, colocar e quebrar; a água conta para entidades, espalha e é desenhada
 (testado com o Angelica; sem ele falta ver dentro de um mundo). O fluxo dela ainda não avisa plugins de proteção. Testado no pack real: [docs/TESTES.md](docs/TESTES.md).
@@ -30,5 +30,20 @@ Comece por [docs/FASE-0.md](docs/FASE-0.md).
 | [docs/DELTAS.md](docs/DELTAS.md) | o que mudou e o que vale portar |
 | [docs/COMPATIBILIDADE.md](docs/COMPATIBILIDADE.md) | convivência com BelowCore, Player Backport, Kunftig, Angelica, Et Futurum, Crucible e os demais |
 | [docs/adr/](docs/adr/) | decisões de arquitetura |
+
+## Configuração
+
+`config/neostates.cfg`, uma opção por parte. Use os mesmos valores no servidor e nos clientes.
+
+| Opção | Padrão | Desliga |
+|---|---|---|
+| `visual.modernWaterColor` | `true` | textura em cinza e cor por bioma |
+| `visual.modernWaterFog` | `true` | névoa submersa do 1.21.1 |
+| `physics.modernWaterPhysics` | `true` | "na água" pela superfície real, empurrão, afundamento, pulo, descida agachado |
+| `physics.modernWaterLight` | `true` | a água tirar só 1 de luz por bloco |
+| `state.waterlogging` | `true` | blocos poderem conter água (a água já guardada fica no mundo, sem efeito) |
+
+Com `modernWaterPhysics` ligado, o empurrão de líquidos do Et Futurum (`adjustedLiquidPhysics`) deixa de valer para a
+água; o da lava continua.
 
 O que não foi verificado em código ou em jogo aparece nos documentos como **[A VERIFICAR]**.

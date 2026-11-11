@@ -1,5 +1,6 @@
 package com.akashic.neostates;
 
+import net.minecraft.init.Blocks;
 import net.minecraftforge.common.MinecraftForge;
 
 import org.apache.logging.log4j.LogManager;
@@ -38,6 +39,11 @@ public class NeoStatesMod {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
+        if (NeoConfig.modernWaterLight) {
+            // 1.21.1: water dims light by 1 per block. Both sides compute light, so both need the same value.
+            Blocks.water.setLightOpacity(1);
+            Blocks.flowing_water.setLightOpacity(1);
+        }
         WaterNet.init();
         MinecraftForge.EVENT_BUS.register(new WaterNet());
         MinecraftForge.EVENT_BUS.register(new WaterSave());

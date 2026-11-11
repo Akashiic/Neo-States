@@ -14,8 +14,11 @@ import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 
+import com.akashic.neostates.NeoConfig;
 import com.akashic.neostates.api.FluidView;
 import com.akashic.neostates.api.NeoStates;
+import com.akashic.neostates.physics.ModernWater;
+import com.akashic.neostates.water.BukkitFlow;
 import com.akashic.neostates.water.WaterBuckets;
 import com.akashic.neostates.water.WaterTicks;
 
@@ -176,6 +179,8 @@ public final class WaterSelfTest {
             "balde em pedra: regra vanilla",
             WaterBuckets.use(w, this.bx, this.by, this.bz, new ItemStack(Items.water_bucket)) == null);
 
+        int firedBefore = BukkitFlow.fired();
+
         // 7. a hosted source over a hole falls; the host is not written
         x = this.bx + 1;
         z = this.bz + 5;
@@ -214,5 +219,55 @@ public final class WaterSelfTest {
             "sem a fonte, a água vizinha seca",
             w.getBlock(x + 1, y, z)
                 .getMaterial() != Material.water || w.getBlockMetadata(x + 1, y, z) != 1);
+
+        // 9. plugins are asked before hosted water flows (Bukkit servers)
+        if (BukkitFlow.available()) {
+            check("o fluxo da água hospedada pergunta ao Bukkit (BlockFromToEvent)", BukkitFlow.fired() > firedBefore);
+        } else {
+            this.lines.add("--    sem Bukkit: evento de fluxo não se aplica");
+        }
+
+        // 10. the surface the eyes and the body use is the drawn one, 8/9 of a source
+        x = this.bx + 7;
+        z = this.bz + 7;
+        w.setBlock(x, y, z, Blocks.water, 0, 2);
+        if (NeoConfig.modernWaterPhysics) {
+            check("olho a 0.5 de uma fonte: dentro", ModernWater.submerged(w, x + 0.5D, y + 0.5D, z + 0.5D));
+            check(
+                "olho a 0.95 de uma fonte: fora (a superfície é 8/9)",
+                !ModernWater.submerged(w, x + 0.5D, y + 0.95D, z + 0.5D));
+        }
+        w.setBlock(x, y, z, Blocks.air, 0, 2);
+
+        // 11. sinking and swimming up at 1.21.1's speeds, in a closed shaft of still water
+        if (NeoConfig.modernWaterPhysics) {
+            x = this.bx + 6;
+            z = this.bz + 2;
+            for (int h = 1; h <= 6; h++) {
+                w.setBlock(x - 1, this.by + h, z, Blocks.glass, 0, 2);
+                w.setBlock(x + 1, this.by + h, z, Blocks.glass, 0, 2);
+                w.setBlock(x, this.by + h, z - 1, Blocks.glass, 0, 2);
+                w.setBlock(x, this.by + h, z + 1, Blocks.glass, 0, 2);
+                w.setBlock(x, this.by + h, z, Blocks.water, 0, 2);
+            }
+            ProbeEntity sinker = new ProbeEntity(w);
+            sinker.setPosition(x + 0.5D, this.by + 4.5D, z + 0.5D);
+            for (int tick = 0; tick < 60; tick++) {
+                sinker.onUpdate();
+            }
+            check(
+                "afunda a 0.025 por tick (ficou em " + String.format("%.4f", sinker.motionY) + ")",
+                sinker.isInWater() && Math.abs(sinker.motionY + 0.025D) < 0.002D);
+            ProbeEntity swimmer = new ProbeEntity(w);
+            swimmer.setPosition(x + 0.5D, this.by + 1.1D, z + 0.5D);
+            for (int tick = 0; tick < 22; tick++) {
+                swimmer.setJumping(true);
+                swimmer.onUpdate();
+            }
+            // 0.135 is what is left after the tick's drag and sinking; with the next tick's 0.04 it moves 0.175
+            check(
+                "sobe a 0.175 por tick com o pulo (ficou em " + String.format("%.4f", swimmer.motionY + 0.04D) + ")",
+                swimmer.isInWater() && Math.abs(swimmer.motionY - 0.135D) < 0.005D);
+        }
     }
 }

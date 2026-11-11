@@ -182,7 +182,9 @@ estruturas geradas dentro d'água devem nascer waterlogged; se o `waterSourceCon
 
 | 5 | Camada C, render: a água hospedada é desenhada pelo renderizador de líquidos vanilla no passe translúcido; a camada chega ao `ChunkCache` e às threads de meshing do Angelica |
 
-O que foi verificado até a Fase 5:
+| 6 | Camada B: "na água", olhos e câmera pela superfície real; empurrão da correnteza, afundamento, regra do pulo e descida agachado do 1.21.1; luz da água; evento de fluxo do Bukkit; opções para desligar cada parte |
+
+O que foi verificado até a Fase 6:
 
 * build e 28 testes;
 * servidor de desenvolvimento (Forge, Java 21) sobe até `Done` com o mod;
@@ -200,7 +202,10 @@ O que foi verificado até a Fase 5:
 
 * **Fase 5 no pack real**: blocos com água desenhados no Angelica, dentro de um lago e no ar.
 
-Continuam **[A VERIFICAR]**: o desenho sem Angelica, shaders, biomas com cor própria, os plugins e o proxy.
+* **Fase 6 no pack real**: 35 verificações do autoteste no Crucible; o contrato do Player Backport mantido.
+
+Continuam **[A VERIFICAR]**: nadar e pescar de verdade no cliente, um plugin de proteção barrando o fluxo, o desenho
+sem Angelica, shaders, biomas com cor própria, os plugins e o proxy.
 
 ## Ordem proposta
 

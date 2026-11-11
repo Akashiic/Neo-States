@@ -13,6 +13,8 @@ import net.minecraft.block.BlockTrapDoor;
 import net.minecraft.block.BlockWall;
 import net.minecraft.init.Blocks;
 
+import com.akashic.neostates.NeoConfig;
+
 /**
  * Which blocks may hold water in their cell. The defaults are the 1.7.10 classes whose 1.21.1 descendants are
  * waterloggable and that vanilla water does not wash away; a full opaque cube (a double slab) never holds water.
@@ -43,6 +45,9 @@ public final class WaterHolders {
     }
 
     private static boolean compute(Block block) {
+        if (!NeoConfig.waterlogging) {
+            return false;
+        }
         if (block.getMaterial()
             .isLiquid() || block.isOpaqueCube()) {
             return false;

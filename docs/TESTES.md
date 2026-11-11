@@ -147,6 +147,44 @@ Não executado nesta fase:
 * blocos de mods que sobrescrevem `canRenderInPass` (a água deles não é desenhada, por desenho);
 * ordenação de translúcidos com vários blocos com água em fila.
 
+## Fase 6 e pendências (2026-11-11)
+
+Neo States `0.1.0-alpha.6`, mais duas builds candidatas dos outros repositórios com a ponte para o Neo States:
+Akashic Player `0.1.0-alpha.30-neostates-bridge` e Kunftig `0.1.0-dev-neostates`. As três nos dois lados.
+
+O autoteste ganhou 5 verificações (35 no Crucible, 34 no servidor de desenvolvimento, que não tem Bukkit):
+
+| Verificação | Resultado |
+|---|---|
+| As 30 regras da Fase 4 | passou nos dois |
+| O fluxo da água hospedada dispara `BlockFromToEvent` (Crucible) | passou: o evento chega ao Bukkit |
+| Olho a 0.5 de uma fonte: dentro; a 0.95: fora (a superfície é 8/9) | passou |
+| Uma entidade viva sem IA afunda a 0.025 bloco/tick num poço fechado | passou (`-0.0250`) |
+| A mesma, segurando o pulo, sobe a 0.175 bloco/tick | passou (`0.1750`) |
+
+No pack:
+
+| Verificação | Resultado |
+|---|---|
+| O contrato do Player Backport em `moveEntityWithHeading` | mantido: `Installed swimming horizontal drag hooks … (2 axes)` no servidor e no cliente, sem `Refusing swim movement` |
+| O Player Backport enxerga o Neo States | `Neo States found: water held inside blocks counts for swimming` |
+| Ícone da água no WAILA | voltou a ser o azul ([imagem](evidencias/fase-6/submerso-icone-azul-luz-11.jpg)) |
+| Luz dentro d'água | o WAILA mostra luz de céu 11 no ponto do lago que antes dava 6 |
+| Cliente e servidor sobem com as três builds novas, jogador entra no lago, sonda responde | passou |
+
+Fora do Neo States: o log do servidor tem `AkashicWorldFirewallCore: Refusing WorldServer block tick patch:
+originalCalls=0, hookCalls=0`. Essa linha já aparecia no primeiro boot, com o Neo States `alpha.2` (sem nenhum mixin
+no servidor), então não vem daqui; mas é um patch daquele mod que não está sendo aplicado no Crucible.
+
+Não executado:
+
+* **o evento de fluxo com um plugin de proteção de verdade**: confirmei que o evento é entregue ao Bukkit, não que um
+  plugin o cancela e a água para (os plugins estão desligados na cópia de teste);
+* **nadar de verdade no cliente**: correr e nadar dentro de água hospedada, descer agachado, pular no raso. O ambiente
+  não tem controle de mouse; as velocidades foram medidas no servidor com uma entidade de teste;
+* **pesca**: o anzol do Kunftig com a ponte não foi lançado;
+* o empurrão da correnteza num jogador (a fórmula tem teste unitário; em jogo, não).
+
 ## Não executado até aqui
 
 Das Fases 1 e 2:

@@ -26,8 +26,8 @@ import cpw.mods.fml.common.gameevent.TickEvent;
  * It never writes into its own cell. Whether and where the water may go is asked of vanilla's own flowing water
  * ({@code func_149809_q}, {@code func_149808_o}), and the neighbour is written by vanilla's {@code func_149813_h}.
  * <p>
- * The queue is not saved: after a restart a hosted source waits for the next neighbour change to flow again.
- * Crucible's {@code BlockFromToEvent} is not fired yet for this flow (docs/COMPATIBILIDADE.md).
+ * The queue is not saved: after a restart a hosted source waits for the next neighbour change to flow again. On a
+ * Bukkit server every step asks {@link BukkitFlow} first, as vanilla's flowing water does.
  */
 public final class WaterTicks {
 
@@ -94,7 +94,9 @@ public final class WaterTicks {
         BlockDynamicLiquidInvoker flow = (BlockDynamicLiquidInvoker) water;
         if (flow.neostates$canFlowInto(world, x, y - 1, z)) {
             // a falling column, as a source over a hole makes
-            flow.neostates$flowInto(world, x, y - 1, z, 8);
+            if (BukkitFlow.allows(world, x, y, z, 0)) {
+                flow.neostates$flowInto(world, x, y - 1, z, 8);
+            }
             return;
         }
         boolean[] sides = flow.neostates$optimalSides(world, x, y, z);
@@ -102,9 +104,9 @@ public final class WaterTicks {
         boolean east = sides[1];
         boolean north = sides[2];
         boolean south = sides[3];
-        if (west) flow.neostates$flowInto(world, x - 1, y, z, 1);
-        if (east) flow.neostates$flowInto(world, x + 1, y, z, 1);
-        if (north) flow.neostates$flowInto(world, x, y, z - 1, 1);
-        if (south) flow.neostates$flowInto(world, x, y, z + 1, 1);
+        if (west && BukkitFlow.allows(world, x, y, z, 4)) flow.neostates$flowInto(world, x - 1, y, z, 1);
+        if (east && BukkitFlow.allows(world, x, y, z, 5)) flow.neostates$flowInto(world, x + 1, y, z, 1);
+        if (north && BukkitFlow.allows(world, x, y, z, 2)) flow.neostates$flowInto(world, x, y, z - 1, 1);
+        if (south && BukkitFlow.allows(world, x, y, z, 3)) flow.neostates$flowInto(world, x, y, z + 1, 1);
     }
 }
