@@ -174,8 +174,13 @@ não escurece o que já foi refeito. Um bloco com água (cerca, painel) não gan
 com a do próprio bloco; lajes e escadas do 1.7.10 já barram a luz inteira, com ou sem água.
 
 Na Fase 7 entrou a regra das fontes novas para blocos que contêm água (`FlowingFluid.getNewLiquid`): entre duas
-fontes, sobre bloco sólido ou fonte, o bloco enche. O 1.21.1 também olha a forma do bloco para decidir se a água
-passa por uma face; aqui a forma não é considerada.
+fontes, sobre bloco sólido ou fonte, o bloco enche.
+
+Na Fase 8 entrou o caso waterlogged de E-8: a água sai de um bloco que a contém só pelas faces que ele deixa abertas
+(`water/HolderShapes`, lido do metadata: laje, escada, alçapão, escada de mão). Só faces inteiras contam; duas faces
+parciais que juntas fechariam o quadrado e os cantos de escada não são considerados. E-6 (espalhar para os lados ao
+cair com 3 fontes vizinhas), B-4, G-8 e G-9 continuam de fora: os dois primeiros mexem no `BlockDynamicLiquid`, que o
+Crucible reescreve, e os dois últimos são de desenho e pedem teste com shader.
 
 O empurrão de um jogador depende de a física rodar no cliente (no 1.7.10 o cliente é quem move o jogador): a opção
 tem de ter o mesmo valor nos dois lados.

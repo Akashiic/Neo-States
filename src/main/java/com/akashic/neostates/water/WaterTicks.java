@@ -123,8 +123,21 @@ public final class WaterTicks {
 
     private static final int[] SIDE_X = { -1, 1, 0, 0 };
     private static final int[] SIDE_Z = { 0, 0, -1, 1 };
-    /** Bukkit's face from the source at that side towards the cell: east, west, south, north. */
+    /** The side of the source at that offset that faces the cell: east, west, south, north. */
     private static final int[] SIDE_FACE = { 5, 4, 3, 2 };
+    /** The side of the cell that faces the source at that offset: west, east, north, south. */
+    private static final int[] SIDE_BACK = { 4, 5, 2, 3 };
+
+    /** Whether water can go from the source at that offset into the cell: no whole face in between. */
+    private static boolean opens(World world, int x, int y, int z, Block host, int meta, int side) {
+        if (HolderShapes.closed(host, meta, SIDE_BACK[side])) {
+            return false;
+        }
+        int sx = x + SIDE_X[side];
+        int sz = z + SIDE_Z[side];
+        Block source = world.getBlock(sx, y, sz);
+        return !HolderShapes.closed(source, world.getBlockMetadata(sx, y, sz), SIDE_FACE[side]);
+    }
 
     /** Whether the cell is a water source: a still or flowing water block at level 0, or a block that holds water. */
     public static boolean isSource(World world, int x, int y, int z) {
@@ -146,8 +159,10 @@ public final class WaterTicks {
     private static void fill(World world, int x, int y, int z) {
         int sources = 0;
         int from = -1;
+        Block host = world.getBlock(x, y, z);
+        int meta = world.getBlockMetadata(x, y, z);
         for (int side = 0; side < 4; side++) {
-            if (isSource(world, x + SIDE_X[side], y, z + SIDE_Z[side])) {
+            if (isSource(world, x + SIDE_X[side], y, z + SIDE_Z[side]) && opens(world, x, y, z, host, meta, side)) {
                 sources++;
                 if (from < 0) {
                     from = side;
@@ -199,7 +214,9 @@ public final class WaterTicks {
         }
         BlockDynamicLiquid water = (BlockDynamicLiquid) Blocks.flowing_water;
         BlockDynamicLiquidInvoker flow = (BlockDynamicLiquidInvoker) water;
-        if (flow.neostates$canFlowInto(world, x, y - 1, z)) {
+        int meta = world.getBlockMetadata(x, y, z);
+        int shape = HolderShapes.kind(host);
+        if (!HolderShapes.closed(shape, meta, 0) && flow.neostates$canFlowInto(world, x, y - 1, z)) {
             // a falling column, as a source over a hole makes
             if (BukkitFlow.allows(world, x, y, z, 0)) {
                 flow.neostates$flowInto(world, x, y - 1, z, 8);
@@ -207,10 +224,11 @@ public final class WaterTicks {
             return;
         }
         boolean[] sides = flow.neostates$optimalSides(world, x, y, z);
-        boolean west = sides[0];
-        boolean east = sides[1];
-        boolean north = sides[2];
-        boolean south = sides[3];
+        // the water leaves through the faces the block leaves open (1.21.1's canPassThroughWall)
+        boolean west = sides[0] && !HolderShapes.closed(shape, meta, 4);
+        boolean east = sides[1] && !HolderShapes.closed(shape, meta, 5);
+        boolean north = sides[2] && !HolderShapes.closed(shape, meta, 2);
+        boolean south = sides[3] && !HolderShapes.closed(shape, meta, 3);
         if (west && BukkitFlow.allows(world, x, y, z, 4)) flow.neostates$flowInto(world, x - 1, y, z, 1);
         if (east && BukkitFlow.allows(world, x, y, z, 5)) flow.neostates$flowInto(world, x + 1, y, z, 1);
         if (north && BukkitFlow.allows(world, x, y, z, 2)) flow.neostates$flowInto(world, x, y, z - 1, 1);

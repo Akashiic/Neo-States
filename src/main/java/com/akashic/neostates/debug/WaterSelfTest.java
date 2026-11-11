@@ -270,6 +270,34 @@ public final class WaterSelfTest {
                 swimmer.isInWater() && Math.abs(swimmer.motionY - 0.135D) < 0.005D);
         }
 
+        // 11b. the jump key in water no deeper than 0.4, feet on the ground: a jump, not a paddle. Also for an
+        // entity kept as a 1.7.10 client keeps its own player, whose getEyeHeight() is 0.12
+        if (NeoConfig.modernWaterPhysics) {
+            clear(true);
+            x = this.bx + 4;
+            z = this.bz + 4;
+            w.setBlock(x, y, z, Blocks.water, 6, 2);
+            for (int kind = 0; kind < 2; kind++) {
+                ProbeEntity wader = new ProbeEntity(w, kind == 1);
+                wader.setPosition(x + 0.5D, y + wader.yOffset, z + 0.5D);
+                for (int tick = 0; tick < 10; tick++) {
+                    wader.onUpdate();
+                }
+                double feet = wader.boundingBox.minY;
+                boolean ready = wader.isInWater() && wader.onGround;
+                wader.setJumping(true);
+                wader.onUpdate();
+                double rose = wader.boundingBox.minY - feet;
+                check(
+                    "pulo no raso sai do chão" + (kind == 1 ? ", jogador como no cliente" : "")
+                        + " (subiu "
+                        + String.format("%.3f", rose)
+                        + ")",
+                    ready && rose > 0.4D);
+            }
+            w.setBlock(x, y, z, Blocks.air, 0, 2);
+        }
+
         // 12. a holder between two sources, over a solid block, fills up (1.21.1's rule for new sources)
         clear(true);
         x = this.bx + 4;
@@ -281,6 +309,37 @@ public final class WaterSelfTest {
         w.setBlock(x + 1, y, z, Blocks.water, 0, 2);
         WaterTicks.spreadNow(w, x, y, z);
         check("laje entre duas fontes, sobre bloco sólido, enche", logged(x, y, z));
+
+        // 12b. water leaves a holder only through its open faces: a bottom slab keeps it over a hole, a top slab
+        // lets it fall, stairs keep it behind their back
+        clear(true);
+        x = this.bx + 2;
+        z = this.bz + 2;
+        int shelf = this.by + 3;
+        w.setBlock(x, shelf, z, Blocks.stone_slab, 0, 2);
+        NeoStates.setWaterlogged(w, x, shelf, z, true);
+        WaterTicks.spreadNow(w, x, shelf, z);
+        check("laje de baixo com água não vaza para baixo", w.isAirBlock(x, shelf - 1, z));
+        check(
+            "laje de baixo com água escorre para os lados",
+            w.getBlock(x + 1, shelf, z)
+                .getMaterial() == Material.water);
+        clear(true);
+        w.setBlock(x, shelf, z, Blocks.stone_slab, 8, 2);
+        NeoStates.setWaterlogged(w, x, shelf, z, true);
+        WaterTicks.spreadNow(w, x, shelf, z);
+        check(
+            "laje de cima com água vaza para baixo",
+            w.getBlock(x, shelf - 1, z)
+                .getMaterial() == Material.water);
+        clear(true);
+        w.setBlock(x, y, z, Blocks.oak_stairs, 0, 2);
+        NeoStates.setWaterlogged(w, x, y, z, true);
+        WaterTicks.spreadNow(w, x, y, z);
+        check(
+            "escada com água: não sai pelas costas (leste), sai pela frente (oeste)",
+            w.isAirBlock(x + 1, y, z) && w.getBlock(x - 1, y, z)
+                .getMaterial() == Material.water);
 
         // 13. old light under water is brought up to date: 1 less per block of water, straight down and sideways
         clear(true);

@@ -246,11 +246,51 @@ de time: **não testados** em jogo.
 
 40 verificações, `RESULTADO: PASSOU` no Crucible, em dois lugares do mundo.
 
+## Fase 8: fechamento (2026-11-11)
+
+Neo States `0.1.0-alpha.8`. O plano original ia até a Fase 7; esta fase fecha o que vinha ficando como "não testado"
+e uma diferença de comportamento que faltava (a forma dos blocos que contêm água).
+
+### Forma dos blocos (1.21.1 `canPassThroughWall`)
+
+Autoteste: laje de baixo com água não vaza para baixo e escorre para os lados; laje de cima vaza para baixo; escada
+não solta água pelas costas e solta pela frente. A regra das duas fontes também respeita as faces fechadas.
+
+### Um erro achado pelo teste com jogador
+
+O pulo no raso não funcionava **para o jogador local**: no 1.7.10 o `getEyeHeight()` do jogador no cliente devolve
+0,12 (a altura fica no `posY`), e a regra do 1.21.1 trata olho abaixo de 0,4 como "sem limiar". O autoteste da Fase 6
+não pegava porque a entidade de teste tem olho normal. Corrigido (altura do olho acima dos pés) e coberto por uma
+entidade de teste montada como o jogador do cliente.
+
+### Física com um jogador de verdade (TEOF 5.4 + Crucible, `/neostates rastro`)
+
+| Movimento | Medido | 1.21.1 |
+|---|---|---|
+| Parado numa correnteza reta (canal, nível 6) | 0,070 por tick em regime | 0,014 ÷ 0,2 = 0,070 |
+| Pulo em água de nível 1 (altura 0,11), pé no chão, antes da correção | pico 0,36 | pulo normal |
+| O mesmo, depois da correção | 161,42 → 161,75 → 162,00 → 162,16, pico 1,24 | 0,42; 0,751; 0,997; 1,16... |
+| Pulo no seco, ao lado (referência) | pico 1,249 | 1,249 |
+| Nadando para a frente, submerso | afunda 0,024 por tick | 0,025 |
+| Nadando correndo (Ctrl), submerso, olhando para a frente | não afunda (0,000), mais rápido | sem gravidade ao correr |
+
+A correnteza reta dá o mesmo número no 1.7.10; serve para ver que o empurrão novo não quebrou, não para distinguir.
+
+### Sem Angelica e cor por bioma
+
+Cliente de desenvolvimento (só Forge, UniMixins e GTNHLib, sem Angelica) contra o servidor de desenvolvimento, mundo
+plano de pântano: a água sai com a cor do pântano e os blocos com água (muro, painel, cerca, escada, laje) são
+desenhados dentro dela ([imagem](evidencias/fase-8/sem-angelica-pantano.jpg)). Autoteste nesse ambiente: 43
+verificações (sem as do Bukkit).
+
+### Autoteste
+
+46 verificações, `RESULTADO: PASSOU` no Crucible.
+
 ## Não executado até aqui
 
 Das Fases 1 e 2:
 
 * **shaders** (BSL e Complementary estão no pack): precisam de placa de vídeo de verdade para um resultado que valha;
-* biomas diferentes (pântano, frio): o teste foi num bioma só, de mod (Ender Forest, cor padrão);
-* cliente vanilla sem Angelica dentro de um mundo (só até o menu, no ambiente de desenvolvimento);
+* biomas frios e de mods com cor própria (pântano e cor padrão foram vistos);
 * os plugins do servidor e o proxy (Velocity + ProtocolObelisk).

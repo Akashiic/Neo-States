@@ -45,6 +45,7 @@ public abstract class MixinEntityLivingBase_ModernWater extends Entity {
         return WaterPhysics.swimsUp(
             this.onGround,
             ((WaterBody) this).neostates$waterHeight(),
-            WaterPhysics.jumpThreshold(this.getEyeHeight()));
+            // the eyes above the feet: a 1.7.10 client player's getEyeHeight() is 0.12, the rest is in its posY
+            WaterPhysics.jumpThreshold((float) (this.posY + this.getEyeHeight() - this.boundingBox.minY)));
     }
 }
