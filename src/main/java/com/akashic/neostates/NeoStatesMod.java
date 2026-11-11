@@ -1,10 +1,14 @@
 package com.akashic.neostates;
 
+import net.minecraftforge.common.MinecraftForge;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.akashic.neostates.debug.CommandNeoStates;
 import com.akashic.neostates.fluid.FluidPipeline;
+import com.akashic.neostates.net.WaterNet;
+import com.akashic.neostates.water.WaterSave;
 
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
@@ -31,6 +35,9 @@ public class NeoStatesMod {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
+        WaterNet.init();
+        MinecraftForge.EVENT_BUS.register(new WaterNet());
+        MinecraftForge.EVENT_BUS.register(new WaterSave());
         proxy.init();
     }
 

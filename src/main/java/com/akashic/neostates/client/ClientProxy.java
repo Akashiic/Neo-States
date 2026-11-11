@@ -8,6 +8,8 @@ import cpw.mods.fml.common.FMLCommonHandler;
 
 public class ClientProxy extends CommonProxy {
 
+    private final ClientWaterSync waterSync = new ClientWaterSync();
+
     @Override
     public void init() {
         MinecraftForge.EVENT_BUS.register(new GrayWater());
@@ -17,6 +19,14 @@ public class ClientProxy extends CommonProxy {
         FMLCommonHandler.instance()
             .bus()
             .register(fog);
+        FMLCommonHandler.instance()
+            .bus()
+            .register(this.waterSync);
+    }
+
+    @Override
+    public void receive(Object message) {
+        this.waterSync.receive(message);
     }
 
     @Override

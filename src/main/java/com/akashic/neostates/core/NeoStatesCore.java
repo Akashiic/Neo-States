@@ -27,6 +27,7 @@ public class NeoStatesCore implements IFMLLoadingPlugin, IEarlyMixinLoader {
     @Override
     public List<String> getMixins(Set<String> loadedCoreMods) {
         List<String> mixins = new ArrayList<>();
+        mixins.add("common.MixinExtendedBlockStorage_Water");
         if (FMLLaunchHandler.side()
             .isClient()) {
             mixins.add("client.MixinBlockLiquid_GrayIcon");

@@ -50,7 +50,36 @@ Achados:
 3. A névoa adaptada é um azul bem saturado. É o que a fórmula do 1.21.1 produz com a cor `#050533` (o clareamento leva
    o canal mais forte a 1), mas no 1.21.1 o fundo é mais claro por causa do item 2. Rever junto com ele.
 
-Não executado:
+## Fase 3 (2026-11-11): dados do waterlogging
+
+Mesmo ambiente, Neo States `0.1.0-alpha.3`. A camada ainda não muda o jogo: só guarda, salva e sincroniza o bit, e o
+comando `/neostates agua <x> <y> <z> <on|off>` o escreve à mão.
+
+| Verificação | Resultado |
+|---|---|
+| Campo na `ExtendedBlockStorage` junto dos mixins do EndlessIDs, no Crucible e no cliente | passou: os dois lados sobem |
+| Ligar a água hospedada num baú | passou: `bloco=minecraft:chest meta=3 tile=TileEntityChest hospedada=true`; bloco, metadata e TileEntity iguais antes e depois |
+| Ligar numa laje | passou |
+| Ligar numa laje em **Y −5** (seção profunda do BelowCore) | passou |
+| Persistência: parar e subir o Crucible | passou: as três células voltam com `hospedada=true`, a de Y −5 inclusive |
+| Camada do chunk chega ao cliente | passou: `Waterlogging layer of chunk -15,17: 2 sections` (a seção 4 e a seção −1) |
+| Mudança de uma célula chega ao cliente | passou: `Waterlogging at -240 -5 285: false`, `… 71 285: true` |
+
+Isso fecha quatro verificações do [ADR-0001](adr/ADR-0001-armazenamento-waterlogging.md): o campo convive com o
+EndlessIDs; `ChunkDataEvent.Load` dispara depois de o BelowCore recriar as seções profundas; `ChunkDataEvent.Save` e
+`Load` funcionam no Crucible; a seção profunda chega ao cliente antes de a camada desistir de esperar.
+
+Limites desta fase, de propósito:
+
+* o bit não é limpo quando o bloco muda (isso é a Fase 4);
+* nada é desenhado nem afeta entidades (Fases 4 e 5);
+* `ChunkCache` e o `WorldSlice` do Angelica ainda não enxergam a camada.
+
+Não executado nesta fase: o caminho de reenvio de chunk do Hodgepodge, troca de dimensão, e o proxy.
+
+## Não executado até aqui
+
+Das Fases 1 e 2:
 
 * **shaders** (BSL e Complementary estão no pack): precisam de placa de vídeo de verdade para um resultado que valha;
 * biomas diferentes (pântano, frio): o teste foi num bioma só, de mod (Ender Forest, cor padrão);

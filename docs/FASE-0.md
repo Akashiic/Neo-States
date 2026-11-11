@@ -176,7 +176,9 @@ estruturas geradas dentro d'água devem nascer waterlogged; se o `waterSourceCon
 | 1 | esqueleto do mod, API de leitura, pipeline de altura, comando `/neostates sonda`, testes de impressão digital |
 | 2 | Camada A: textura em cinza gerada em tempo de execução, cor por bioma, névoa submersa (opções `modernWaterColor` e `modernWaterFog` em `config/neostates.cfg`) |
 
-O que foi verificado até a Fase 2:
+| 3 | Camada C, dados: 1 bit por célula na seção, salvo pelos eventos de chunk do Forge e sincronizado por pacotes próprios; vale em Y < 0; API 2 (`isWaterlogged`, `setWaterlogged`) |
+
+O que foi verificado até a Fase 3:
 
 * build e 28 testes;
 * servidor de desenvolvimento (Forge, Java 21) sobe até `Done` com o mod;
@@ -185,6 +187,9 @@ O que foi verificado até a Fase 2:
 
 * **pack real**: cliente TEOF 5.4 (Angelica 2.2.43, sem shaders) conectado ao Crucible do dono, com água e névoa
   vistas dentro do mundo. Registro completo, achados e o que não foi executado em [TESTES.md](TESTES.md).
+
+* **Fase 3 no pack real**: água hospedada num baú, numa laje e numa laje em Y −5, persistindo a um reinício do
+  Crucible e chegando ao cliente.
 
 Continuam **[A VERIFICAR]**: shaders, biomas com cor própria, os plugins e o proxy.
 

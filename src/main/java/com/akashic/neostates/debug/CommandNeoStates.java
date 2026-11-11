@@ -24,7 +24,7 @@ public class CommandNeoStates extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "/neostates sonda";
+        return "/neostates sonda | agua <x> <y> <z> <on|off> | ler <x> <y> <z>";
     }
 
     @Override
@@ -34,6 +34,50 @@ public class CommandNeoStates extends CommandBase {
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) {
+        if (args.length == 5 && "agua".equals(args[0])) {
+            int bx = parseInt(sender, args[1]);
+            int by = parseInt(sender, args[2]);
+            int bz = parseInt(sender, args[3]);
+            boolean on = "on".equals(args[4]);
+            boolean changed = NeoStates.setWaterlogged(sender.getEntityWorld(), bx, by, bz, on);
+            say(
+                sender,
+                "água hospedada em " + bx
+                    + " "
+                    + by
+                    + " "
+                    + bz
+                    + ": "
+                    + (on ? "ligada" : "desligada")
+                    + (changed ? "" : " (sem mudança)"));
+            return;
+        }
+        if (args.length == 4 && "ler".equals(args[0])) {
+            int bx = parseInt(sender, args[1]);
+            int by = parseInt(sender, args[2]);
+            int bz = parseInt(sender, args[3]);
+            net.minecraft.world.World world = sender.getEntityWorld();
+            net.minecraft.tileentity.TileEntity tile = world.getTileEntity(bx, by, bz);
+            say(
+                sender,
+                bx + " "
+                    + by
+                    + " "
+                    + bz
+                    + ": bloco="
+                    + net.minecraft.block.Block.blockRegistry.getNameForObject(world.getBlock(bx, by, bz))
+                    + " meta="
+                    + world.getBlockMetadata(bx, by, bz)
+                    + " tile="
+                    + (tile == null ? "-"
+                        : tile.getClass()
+                            .getSimpleName())
+                    + " hospedada="
+                    + NeoStates.isWaterlogged(world, bx, by, bz)
+                    + " fluido="
+                    + describe(NeoStates.fluidAt(world, bx, by, bz)));
+            return;
+        }
         if (args.length != 1 || !"sonda".equals(args[0])) {
             throw new WrongUsageException(this.getCommandUsage(sender));
         }
