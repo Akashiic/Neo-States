@@ -185,6 +185,21 @@ Crucible reescreve, e os dois últimos são de desenho e pedem teste com shader.
 O empurrão de um jogador depende de a física rodar no cliente (no 1.7.10 o cliente é quem move o jogador): a opção
 tem de ter o mesmo valor nos dois lados.
 
+### Fase 9: o que não é o jogador
+
+| # | Aspecto | 1.7.10 | 1.21.1 | Estado |
+|---|---|---|---|---|
+| I-1 | Item na água | afunda (gravidade 0,04 sempre) | com mais de 0,1 de água acima dos pés: sem gravidade, +0,0005 por tick até 0,06, 0,99 do movimento horizontal (`ItemEntity.setUnderwaterMovement`) | portado (`floatingItems`) |
+| I-2 | Item e "na água" | `EntityItem.handleWaterMovement` próprio: a caixa inteira, e nunca marca `inWater` | o mesmo de toda entidade | o item passa pela leitura do 1.21.1; `inWater` continua como no 1.7.10 |
+| I-3 | Orbe de experiência na água | afunda (0,03) | com os olhos na água: `min(v + 0,0005, 0,06)`, 0,99 horizontal | portado (`floatingItems`) |
+| I-4 | Ar fora d'água | volta a 300 de uma vez | +4 por tick; as bolhas ficam na tela enquanto volta | portado (`modernAirRecovery`) |
+| I-5 | Trilhos | a água corrente os arranca | aceitam uma fonte; a corrente não entra na célula | portado (com `waterlogging`) |
+| I-6 | Item na lava | queima | boia (0,95 horizontal) e queima, salvo os imunes | não portado; fica o do Et Futurum |
+| I-7 | Barco | física do 1.7.10 | reescrito no 1.9 | fora do escopo |
+| I-8 | Flecha na água | arrasto 0,8 | arrasto 0,6 | não portado |
+
+Um item ou orbe parado sobe até 0,0005 × 0,98 ÷ 0,02 = 0,0245 bloco por tick.
+
 ### Como o empurrão fiel convive com o Et Futurum
 
 O Et Futurum (`adjustedLiquidPhysics`, ligado por padrão) injeta **dentro** de `World.handleMaterialAcceleration`.

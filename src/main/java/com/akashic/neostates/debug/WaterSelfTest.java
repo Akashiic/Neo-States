@@ -298,6 +298,99 @@ public final class WaterSelfTest {
             w.setBlock(x, y, z, Blocks.air, 0, 2);
         }
 
+        // 11c. items and orbs float (1.21.1's setUnderwaterMovement); also shows no other mod's float adds to it
+        if (NeoConfig.floatingItems && NeoConfig.modernWaterPhysics) {
+            clear(true);
+            x = this.bx + 6;
+            z = this.bz + 2;
+            for (int h = 1; h <= 6; h++) {
+                w.setBlock(x - 1, this.by + h, z, Blocks.glass, 0, 2);
+                w.setBlock(x + 1, this.by + h, z, Blocks.glass, 0, 2);
+                w.setBlock(x, this.by + h, z - 1, Blocks.glass, 0, 2);
+                w.setBlock(x, this.by + h, z + 1, Blocks.glass, 0, 2);
+                w.setBlock(x, this.by + h, z, Blocks.water, 0, 2);
+            }
+            net.minecraft.entity.item.EntityItem item = new net.minecraft.entity.item.EntityItem(
+                w,
+                x + 0.5D,
+                this.by + 1.3D,
+                z + 0.5D,
+                new ItemStack(Items.stick));
+            item.motionX = 0.0D;
+            item.motionY = 0.0D;
+            item.motionZ = 0.0D;
+            StringBuilder first = new StringBuilder();
+            double firstTick = 0.0D;
+            for (int tick = 0; tick < 150; tick++) {
+                item.onUpdate();
+                if (tick < 3) {
+                    first.append(String.format("%.4f ", item.motionY));
+                }
+                if (tick == 0) {
+                    firstTick = item.motionY;
+                }
+            }
+            check(
+                "item boia a 0.0245 por tick (ficou em " + String.format("%.4f", item.motionY)
+                    + ", y "
+                    + String.format("%.2f", item.posY - this.by)
+                    + ", água "
+                    + String.format("%.2f", ((com.akashic.neostates.physics.WaterBody) item).neostates$waterHeight())
+                    + ")",
+                Math.abs(item.motionY - 0.0245D) < 0.002D);
+            check(
+                "nenhum outro mod soma à flutuação do item (primeiros ticks: " + first.toString()
+                    .trim() + ")",
+                firstTick < 0.002D);
+            if (w.getClosestPlayer(x + 0.5D, this.by + 3.0D, z + 0.5D, 12.0D) == null) {
+                net.minecraft.entity.item.EntityXPOrb orb = new net.minecraft.entity.item.EntityXPOrb(
+                    w,
+                    x + 0.5D,
+                    this.by + 1.5D,
+                    z + 0.5D,
+                    1);
+                orb.motionX = 0.0D;
+                orb.motionY = 0.0D;
+                orb.motionZ = 0.0D;
+                for (int tick = 0; tick < 150; tick++) {
+                    orb.onUpdate();
+                }
+                check(
+                    "orbe de experiência boia a 0.0245 por tick (ficou em " + String.format("%.4f", orb.motionY) + ")",
+                    Math.abs(orb.motionY - 0.0245D) < 0.002D);
+            } else {
+                this.lines.add("--    orbe: há um jogador perto (ele atrai o orbe), não se aplica");
+            }
+        }
+
+        // 11d. out of the water the air comes back 4 a tick
+        if (NeoConfig.modernAirRecovery) {
+            clear(true);
+            ProbeEntity breather = new ProbeEntity(w);
+            breather.setPosition(this.bx + 4.5D, this.by + 1.0D, this.bz + 4.5D);
+            breather.setAir(100);
+            breather.onUpdate();
+            int one = breather.getAir();
+            for (int tick = 0; tick < 60; tick++) {
+                breather.onUpdate();
+            }
+            check(
+                "fora d'água o ar volta 4 por tick e para em 300 (100 -> " + one + " -> " + breather.getAir() + ")",
+                one == 104 && breather.getAir() == 300);
+        }
+
+        // 11e. rails: flowing water does not take their cell, and they hold a source
+        clear(true);
+        x = this.bx + 2;
+        z = this.bz + 6;
+        w.setBlock(x, y, z, Blocks.rail, 0, 2);
+        check(
+            "água corrente não entra na célula de um trilho",
+            !((com.akashic.neostates.mixin.early.common.BlockDynamicLiquidInvoker) Blocks.flowing_water)
+                .neostates$canFlowInto(w, x, y, z));
+        check("trilho aceita água", NeoStates.setWaterlogged(w, x, y, z, true) && w.getBlock(x, y, z) == Blocks.rail);
+        NeoStates.setWaterlogged(w, x, y, z, false);
+
         // 12. a holder between two sources, over a solid block, fills up (1.21.1's rule for new sources)
         clear(true);
         x = this.bx + 4;

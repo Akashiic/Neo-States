@@ -287,6 +287,50 @@ verificações (sem as do Bukkit).
 
 46 verificações, `RESULTADO: PASSOU` no Crucible.
 
+## Fase 9: itens, orbes, ar e trilhos (2026-11-11)
+
+Neo States `0.1.0-alpha.9`. Tabela do que foi portado em [DELTAS.md](DELTAS.md), "Fase 9".
+
+### O que os testes pegaram antes de funcionar
+
+Quatro tentativas até o item boiar no Crucible; cada falha foi lida, não contornada:
+
+| Sintoma | Causa | Onde apareceu |
+|---|---|---|
+| Servidor recusa subir: `@Shadow method func_70086_ai ... was not located` | `getAir()` é de `Entity`, não de `EntityLivingBase` | Crucible, na inicialização |
+| Item parado no fundo, altura da água 0 | `EntityItem` tem `handleWaterMovement` próprio, fora da leitura do 1.21.1 | autoteste, desenvolvimento |
+| Servidor recusa subir: `Constant modifier ... failed injection check` | o Galacticraft já modifica a constante da gravidade do item | Crucible, na inicialização |
+| Item parado no fundo, altura da água 1 | gancho antes da chamada de `moveEntity`: os argumentos já estavam na pilha | autoteste, Crucible |
+| Item sobe, mas o 1º tick dá 0,0495 | o Et Futurum agia no tick de entrada na água | autoteste, Crucible (diagnóstico dos três primeiros ticks) |
+
+O bytecode real do Crucible foi lido com `-Dmixin.debug.export=true` (ver [COMPATIBILIDADE.md](COMPATIBILIDADE.md),
+"Bytecode de verdade").
+
+### Autoteste
+
+52 verificações, `RESULTADO: PASSOU` no Crucible com o Et Futurum (`liquidItemFloat=true`) e o Galacticraft; 49 no
+servidor de desenvolvimento. As novas:
+
+| Verificação | Resultado no Crucible |
+|---|---|
+| Item boia a 0,0245 por tick | 0,0233 aos 150 ticks, subindo |
+| Nenhum outro mod soma à flutuação do item | primeiros ticks `0.0005 0.0010 0.0014` |
+| Orbe de experiência boia a 0,0245 por tick | 0,0233 |
+| Fora d'água o ar volta 4 por tick e para em 300 | `100 -> 104 -> 300` |
+| Água corrente não entra na célula de um trilho | passou |
+| Trilho aceita água | passou |
+
+### No cliente do pack
+
+| Verificação | Resultado |
+|---|---|
+| Cliente sobe com os mixins novos (com Galacticraft, Et Futurum, PlayerAPI, Angelica) | passou |
+| Maçãs douradas largadas na água | ficam na superfície ([imagem](evidencias/fase-9/item-boiando.jpg)) |
+| Barra de ar depois de ficar sem ar e sair da água | 1, 2, 4, 6 e 7 bolhas em 0,7 s, 1,2 s, 1,7 s, 2,2 s e 2,8 s, fora d'água ([imagem](evidencias/fase-9/ar-voltando-fora-da-agua.png)): perto de 4 de ar por tick |
+
+Não testado em jogo: item levado por uma correnteza, orbe na água com jogador por perto (o jogador o atrai), trilho
+com água desenhado e com carrinho passando.
+
 ## Não executado até aqui
 
 Das Fases 1 e 2:

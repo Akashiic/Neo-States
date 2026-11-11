@@ -78,4 +78,31 @@ class WaterPhysicsTest {
         WaterPhysics.push(flow, 3, false, 0.0D, 0.0D);
         assertEquals(0.0D, flow[0] + flow[1] + flow[2], 0.0D);
     }
+
+    @Test
+    void aFloatingItemRisesToASteadySpeed() {
+        // ItemEntity.tick in water: setUnderwaterMovement, then the 0.98 drag
+        double v = -0.3D;
+        for (int tick = 0; tick < 600; tick++) {
+            v -= WaterPhysics.itemFloat(v);
+            v *= 0.98D;
+        }
+        assertEquals(5.0E-4F * 0.98D / 0.02D, v, 1.0e-5D);
+        assertEquals(0.0D, WaterPhysics.itemFloat(0.06F), 0.0D);
+        assertEquals(0.0D, WaterPhysics.itemFloat(0.2D), 0.0D);
+    }
+
+    @Test
+    void anOrbNeverRisesFasterThanTheCap() {
+        assertEquals(0.06F, 0.3D - WaterPhysics.orbFloat(0.3D), 0.0D);
+        assertEquals(0.01D + 5.0E-4F, 0.01D - WaterPhysics.orbFloat(0.01D), 1.0e-12D);
+    }
+
+    @Test
+    void airComesBackFourATick() {
+        assertEquals(104, WaterPhysics.regainAir(100, 300));
+        assertEquals(300, WaterPhysics.regainAir(298, 300));
+        assertEquals(300, WaterPhysics.regainAir(300, 300));
+        assertEquals(4, WaterPhysics.regainAir(0, 300));
+    }
 }

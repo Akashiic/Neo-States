@@ -188,7 +188,9 @@ estruturas geradas dentro d'água devem nascer waterlogged; se o `waterSourceCon
 
 | 8 | fechamento: a água sai de um bloco só pelas faces abertas dele; pulo no raso corrigido para o jogador local; desenho sem Angelica e cor de pântano vistos; correnteza, pulo no raso e nado correndo medidos com jogador |
 
-O que foi verificado até a Fase 8:
+| 9 | itens e orbes de experiência boiam; o ar volta aos poucos, com as bolhas na tela; trilhos contêm água e a corrente não os arranca |
+
+O que foi verificado até a Fase 9:
 
 * build e 28 testes;
 * servidor de desenvolvimento (Forge, Java 21) sobe até `Done` com o mod;
@@ -212,6 +214,8 @@ O que foi verificado até a Fase 8:
   subir e descer medidos com um jogador; boia do Kunftig na superfície de água em lajes; fluxo barrado por plugin.
 
 * **Fase 8**: 46 verificações do autoteste no Crucible; ver [TESTES.md](TESTES.md).
+* **Fase 9**: 52 verificações no Crucible, com o Et Futurum e o Galacticraft; item boiando e barra de ar vistos no
+  cliente do pack.
 
 Continuam **[A VERIFICAR]**: mordida e fisgada em água hospedada, um plugin de proteção de verdade, shaders, biomas com cor própria, os plugins e o proxy.
 

@@ -69,7 +69,12 @@ public final class ClientWaterSync {
         while ((incoming = this.inbox.poll()) != null) {
             if (incoming instanceof MessageConfig) {
                 MessageConfig config = (MessageConfig) incoming;
-                NeoConfig.followServer(config.physics, config.light, config.waterlogging);
+                NeoConfig.followServer(
+                    config.physics,
+                    config.light,
+                    config.waterlogging,
+                    config.floatingItems,
+                    config.airRecovery);
                 NeoStatesMod.LOG.info(
                     "Following the server: water physics {}, water light {}, waterlogging {}.",
                     config.physics,

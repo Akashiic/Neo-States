@@ -32,6 +32,36 @@ public final class WaterPhysics {
         return sprinting ? 0.0D : GRAVITY;
     }
 
+    /** {@code ItemEntity#tick}: an item floats when the water reaches more than this above its feet. */
+    public static final double ITEM_FLOAT_DEPTH = 0.1F;
+    /** {@code setUnderwaterMovement}: what a floating item or orb gains per tick, and where it stops gaining. */
+    public static final double FLOAT_LIFT = 5.0E-4F;
+    public static final double FLOAT_MAX = 0.06F;
+    /** {@code setUnderwaterMovement}: horizontal drag of a floating item or orb. */
+    public static final double FLOAT_DRAG = 0.99F;
+    /** {@code ExperienceOrb}: its eyes, above its feet ({@code 0.85} of a height of 0.5). */
+    public static final double ORB_EYES = 0.425D;
+    /** {@code LivingEntity#increaseAirSupply}. */
+    public static final int AIR_REGAIN = 4;
+
+    /**
+     * {@code ItemEntity#setUnderwaterMovement} in place of gravity: what to subtract from the vertical motion (the
+     * game's line is {@code motionY -= gravity}).
+     */
+    public static double itemFloat(double motionY) {
+        return motionY < FLOAT_MAX ? -FLOAT_LIFT : 0.0D;
+    }
+
+    /** {@code ExperienceOrb#setUnderwaterMovement}, the same way: {@code min(motionY + lift, max)}. */
+    public static double orbFloat(double motionY) {
+        return motionY - Math.min(motionY + FLOAT_LIFT, FLOAT_MAX);
+    }
+
+    /** {@code LivingEntity#baseTick}: out of the water, air comes back a little per tick. */
+    public static int regainAir(int air, int max) {
+        return air >= max ? max : Math.min(air + AIR_REGAIN, max);
+    }
+
     /** {@code Entity#getFluidJumpThreshold}. */
     public static double jumpThreshold(float eyeHeight) {
         return eyeHeight < 0.4F ? 0.0D : 0.4D;

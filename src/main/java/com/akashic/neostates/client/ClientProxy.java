@@ -15,6 +15,7 @@ public class ClientProxy extends CommonProxy {
         MinecraftForge.EVENT_BUS.register(new GrayWater());
         MinecraftForge.EVENT_BUS.register(new WaterColorHandler());
         MinecraftForge.EVENT_BUS.register(new SneakDescend());
+        MinecraftForge.EVENT_BUS.register(new AirBar());
         UnderwaterFog fog = new UnderwaterFog();
         MinecraftForge.EVENT_BUS.register(fog);
         FMLCommonHandler.instance()

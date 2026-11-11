@@ -16,6 +16,10 @@ public final class NeoConfig {
     public static boolean modernWaterPhysics = true;
     /** Water takes 1 of light per block as in 1.21.1, instead of 3. */
     public static boolean modernWaterLight = true;
+    /** Items and experience orbs float in water, as since 1.13. */
+    public static boolean floatingItems = true;
+    /** Out of the water, air comes back 4 per tick instead of at once. */
+    public static boolean modernAirRecovery = true;
     /** Chunks lit before the water became clearer are relit once, as they load. */
     public static boolean relightOldChunks = true;
     /** Server time the relighting may take per world tick. */
@@ -28,25 +32,29 @@ public final class NeoConfig {
     private static boolean filePhysics = true;
     private static boolean fileLight = true;
     private static boolean fileWaterlogging = true;
+    private static boolean fileFloating = true;
+    private static boolean fileAir = true;
 
     private NeoConfig() {}
 
     /** Client: the server said how it runs. */
-    public static void followServer(boolean physics, boolean light, boolean holds) {
+    public static void followServer(boolean physics, boolean light, boolean holds, boolean floating, boolean air) {
         modernWaterPhysics = physics;
         modernWaterLight = light;
         waterlogging = holds;
+        floatingItems = floating;
+        modernAirRecovery = air;
         com.akashic.neostates.light.WaterLight.apply(light);
     }
 
     /** Client: connecting to a remote server. Until it says otherwise, it is taken not to have the mod. */
     public static void awaitServer() {
-        followServer(false, false, false);
+        followServer(false, false, false, false, false);
     }
 
     /** Client: back to what the file says. */
     public static void restoreFile() {
-        followServer(filePhysics, fileLight, fileWaterlogging);
+        followServer(filePhysics, fileLight, fileWaterlogging, fileFloating, fileAir);
     }
 
     public static void load(File file) {
@@ -73,6 +81,20 @@ public final class NeoConfig {
             true,
             "A agua tira 1 de luz por bloco, como no 1.21.1 (no 1.7.10 tira 3). Num servidor, vale o valor do"
                 + " servidor.");
+        floatingItems = config.getBoolean(
+            "floatingItems",
+            "physics",
+            true,
+            "Itens e orbes de experiencia boiam na agua e sao levados pela correnteza, como no 1.21.1 (os itens"
+                + " precisam de modernWaterPhysics). Ligada, a"
+                + " flutuacao de itens do Et Futurum (liquidItemFloat) deixa de valer na agua. Num servidor, vale o"
+                + " valor do servidor.");
+        modernAirRecovery = config.getBoolean(
+            "modernAirRecovery",
+            "physics",
+            true,
+            "Fora da agua o ar volta aos poucos (4 por tick), como no 1.21.1, em vez de encher na hora. Num"
+                + " servidor, vale o valor do servidor.");
         relightOldChunks = config.getBoolean(
             "relightOldChunks",
             "physics",
@@ -95,6 +117,8 @@ public final class NeoConfig {
         filePhysics = modernWaterPhysics;
         fileLight = modernWaterLight;
         fileWaterlogging = waterlogging;
+        fileFloating = floatingItems;
+        fileAir = modernAirRecovery;
         if (config.hasChanged()) {
             config.save();
         }

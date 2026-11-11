@@ -17,6 +17,8 @@ public class MessageConfig implements IMessage {
     public boolean physics;
     public boolean light;
     public boolean waterlogging;
+    public boolean floatingItems;
+    public boolean airRecovery;
 
     public MessageConfig() {}
 
@@ -25,12 +27,18 @@ public class MessageConfig implements IMessage {
         message.physics = NeoConfig.modernWaterPhysics;
         message.light = NeoConfig.modernWaterLight;
         message.waterlogging = NeoConfig.waterlogging;
+        message.floatingItems = NeoConfig.floatingItems;
+        message.airRecovery = NeoConfig.modernAirRecovery;
         return message;
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
-        buf.writeByte((this.physics ? 1 : 0) | (this.light ? 2 : 0) | (this.waterlogging ? 4 : 0));
+        buf.writeByte(
+            (this.physics ? 1 : 0) | (this.light ? 2 : 0)
+                | (this.waterlogging ? 4 : 0)
+                | (this.floatingItems ? 8 : 0)
+                | (this.airRecovery ? 16 : 0));
     }
 
     @Override
@@ -39,6 +47,8 @@ public class MessageConfig implements IMessage {
         this.physics = (bits & 1) != 0;
         this.light = (bits & 2) != 0;
         this.waterlogging = (bits & 4) != 0;
+        this.floatingItems = (bits & 8) != 0;
+        this.airRecovery = (bits & 16) != 0;
     }
 
     public static class Handler implements IMessageHandler<MessageConfig, IMessage> {
