@@ -1,0 +1,12 @@
+[
+  {
+    "modid": "neostates",
+    "name": "Neo States",
+    "description": "Água do 1.21.1 no 1.7.10: leitura unificada de fluido, visual por bioma e waterlogging.",
+    "version": "${modVersion}",
+    "mcversion": "${minecraftVersion}",
+    "url": "https://github.com/Akashiic/Neo-States",
+    "authorList": ["Akashiic"],
+    "dependencies": []
+  }
+]

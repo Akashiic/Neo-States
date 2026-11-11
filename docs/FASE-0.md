@@ -147,6 +147,16 @@ idêntico nas versões 2.2.37, 2.2.43 e 2.2.45.
 
 ## Decisões do dono
 
+**Respondidas na Fase 1.** O dono aceitou as cinco recomendações, com três ressalvas que valem sobre a tabela:
+
+| Tema | Decisão |
+|---|---|
+| Empurrão do fluido (linha 2) | mixin próprio, exatamente como no 1.21.1; não contar com o Et Futurum |
+| Gravidade e pulo na água (linha 3) | exatamente como no 1.21.1, sem restringir ao jogador |
+| Dependências (linha 5) | não depender do ChunkAPI nem de bibliotecas da FalsePattern ([ADR-0001, Revisão 1](adr/ADR-0001-armazenamento-waterlogging.md#revisão-1-sem-chunkapi)) |
+| Novo | empurrão entre entidades e entre jogadores como no 1.21.1 ([DELTAS.md, seção I](DELTAS.md#i-empurrão-entre-entidades-a-levantar)) |
+| Crucible | o trabalho no servidor entra quando chegar a hora; cliente e servidor carregam o mod |
+
 | # | Decisão | Opções | Recomendação |
 |---|---|---|---|
 | 1 | Waterlogging: FluidLogged ou implementação própria | depender, bifurcar (LGPL), escrever | escrever, com o formato de 1 bit |
@@ -157,6 +167,13 @@ idêntico nas versões 2.2.37, 2.2.43 e 2.2.45.
 
 Perguntas menores que travam detalhes: quais blocos de mods entram na lista padrão de "pode conter água"; se
 estruturas geradas dentro d'água devem nascer waterlogged; se o `waterSourceConversion` vira gamerule.
+
+## Estado
+
+| Fase | Estado |
+|---|---|
+| 0 | concluída |
+| 1 | esqueleto do mod, API de leitura, pipeline de altura, comando `/neostates sonda`, testes de impressão digital: **compila e os testes passam; ainda não foi carregado em jogo nem em servidor** |
 
 ## Ordem proposta
 

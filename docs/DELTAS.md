@@ -4,7 +4,14 @@ Cada linha compara o código lido dos dois lados ([VANILLA-1.7.10.md](VANILLA-1.
 [MODERN-1.21.1.md](MODERN-1.21.1.md)). A regra do projeto é a mesma do Akashic Player Backport: **só se porta um delta
 provado**. O que é algebricamente igual fica como está.
 
-Colunas: **Igual?** diz se o comportamento observável muda. **Decisão** é a proposta da Fase 0, a confirmar.
+Colunas: **Igual?** diz se o comportamento observável muda. **Decisão** é a proposta da Fase 0.
+
+**Decisões do dono na Fase 1** (valem sobre a coluna "Decisão" onde divergem):
+
+* C-4, C-5, C-6 (empurrão do fluido): **portar exatamente como no 1.21.1**, com código nosso, sem contar com o Et
+  Futurum.
+* D-3, D-5, D-7 (gravidade, pulo e descida na água): **fiéis ao 1.21.1**, para toda entidade viva, não só o jogador.
+* Empurrão **entre entidades** (seção I, nova): também fiel ao 1.21.1; ainda não levantado.
 
 ## A. Altura e geometria do fluido
 
@@ -128,13 +135,39 @@ O Et Futurum Requiem já tem `BlockBubbleColumn` (padrão ligado), com soul sand
 é **não reimplementar** e só garantir que as costuras do Neo States tratam esse bloco como água. Comparar as constantes
 dele com as do 1.21.1 (tabela na seção 8 do documento moderno) fica **[A VERIFICAR]**.
 
+## I. Empurrão entre entidades (a levantar)
+
+Pedido do dono na Fase 1: colisão entre entidades e entre jogadores como no 1.21.1. É outro assunto que o empurrão do
+**fluido** (seção C): no 1.21.1 são `Entity.push(Entity)`, `LivingEntity.pushEntities` e a gamerule
+`maxEntityCramming`; no 1.7.10, `Entity.applyEntityCollision` e `EntityLivingBase.collideWithNearbyEntities`.
+
+Nada disso foi lido na Fase 0. Dois fatos já conhecidos condicionam o trabalho:
+
+* o Akashic Player Backport já tem um transformador em `Entity.applyEntityCollision` (`PlayerCollisionTransformer`) e
+  regras de colisão próprias (`CollisionPolicy`, `CollisionRuleSavedData`);
+* o Hodgepodge tira as caixas de entidade da colisão de `EntityItem` (`fastItemEntityPhysics`).
+
+**[A VERIFICAR]** os dois lados no decompilador, e em qual repositório isso mora (a colisão de jogador já é do Player
+Backport).
+
 ## Resumo: o que vale portar
 
 1. Unificar a leitura de altura (A-5, A-6, A-7, C-1, C-2).
 2. Waterlogging inteiro (F), com B-6, E-8 e E-9.
 3. Visual (G-1 a G-7).
 4. Gravidade e pulo na água do jogador (D-3, D-5, D-7), atrás de opção.
-5. Decidir com o dono: empurrão moderno (C-4 a C-6) contra o `adjustedLiquidPhysics` do Et Futurum; E-6.
+5. Empurrão do fluido como no 1.21.1 (C-4 a C-6), decidido na Fase 1. Falta decidir E-6.
 
 O que **não** se porta: o motor `FlowingFluid` inteiro, a tabela de níveis, o vetor de fluxo, o arraste (já é do
 Player Backport), bolhas e itens flutuando (já são do Et Futurum).
+
+### Como o empurrão fiel convive com o Et Futurum
+
+O Et Futurum (`adjustedLiquidPhysics`, ligado por padrão) injeta **dentro** de `World.handleMaterialAcceleration`.
+Para o resultado ser exatamente o do 1.21.1, o Neo States não pode passar por esse método para a água: a detecção e o
+empurrão passam a ser calculados por código nosso a partir de `Entity.handleWaterMovement` (equivalente a
+`updateFluidHeightAndDoFluidPushing`). Com isso as injeções do Et Futurum na água ficam sem efeito, sem conflito de
+mixin; a parte dele que faz a **lava** empurrar continua valendo. Recomendação para o pack: desligar
+`adjustedLiquidPhysics` para não ter dois donos do mesmo comportamento.
+
+A impressão digital do Player Backport não é tocada: a gravidade troca a constante `0.02D`, não os três `0.8`.

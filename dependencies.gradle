@@ -1,0 +1,16 @@
+/*
+ * Neo States has no hard dependency on any other mod (decision of phase 1: no ChunkAPI, no FalsePatternLib).
+ * The GTNH convention adds Minecraft, Forge and, once mixins are enabled, the UniMixins annotation processor.
+ */
+dependencies {
+    testImplementation(platform('org.junit:junit-bom:5.9.2'))
+    testImplementation('org.junit.jupiter:junit-jupiter')
+    testRuntimeOnly('org.junit.platform:junit-platform-launcher')
+}
+
+tasks.withType(Test).configureEach {
+    testLogging {
+        events 'failed'
+        exceptionFormat 'full'
+    }
+}

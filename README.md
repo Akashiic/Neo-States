@@ -9,7 +9,14 @@ servidor Crucible em Java 21, clientes em Java 8. Começa pela água, em três c
 | B, física | leitura unificada de altura, movimento do jogador na água |
 | C, estado | waterlogging: blocos parciais com água na mesma célula |
 
-**Estado: Fase 0 (levantamento técnico). Ainda não há código de mod.**
+**Estado: Fase 1.** Há o esqueleto do mod, a API de leitura de fluido e os testes de impressão digital. Nenhum
+comportamento do jogo muda ainda. Não foi carregado em jogo nem em servidor.
+
+```bash
+VERSION=0.1.0-alpha.1 ./gradlew spotlessApply build -x javadoc
+```
+
+Se o Maven Central responder 429, repita com `--max-workers=1`.
 
 Comece por [docs/FASE-0.md](docs/FASE-0.md).
 

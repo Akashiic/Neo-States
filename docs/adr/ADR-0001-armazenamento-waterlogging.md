@@ -1,6 +1,8 @@
 # ADR-0001: onde guardar o waterlogging no 1.7.10
 
-* **Estado**: preliminar (Fase 0). Vira "aceito" depois do protótipo da Fase 1 e das verificações do fim.
+* **Estado**: preliminar. **Revisado na Fase 1**: o dono decidiu não depender do ChunkAPI nem de bibliotecas da
+  FalsePattern. A âncora (campo na seção) e o formato (1 bit) ficam; persistência e rede passam a ser nossas. Ver
+  [Revisão 1](#revisão-1-sem-chunkapi), que substitui o que este documento diz sobre o ChunkAPI.
 * **Contexto de leitura**: [VANILLA-1.7.10.md](../VANILLA-1.7.10.md), [MODERN-1.21.1.md](../MODERN-1.21.1.md),
   [COMPATIBILIDADE.md](../COMPATIBILIDADE.md).
 
@@ -14,6 +16,47 @@ Guardar o waterlogging numa **camada paralela de 1 bit por célula, presa a cada
 não são tocados (não é a Abordagem C).
 
 Implementação própria, sem depender do FluidLogged, cobrindo as lacunas dele listadas adiante.
+
+> A parte "deixar a persistência e a sincronização com o ChunkAPI" foi **revogada** pela Revisão 1 abaixo.
+
+## Revisão 1: sem ChunkAPI
+
+Decisão do dono (Fase 1): o Neo States não declara dependência do ChunkAPI nem do FalsePatternLib.
+
+O que **não** muda: campo `@Unique long[]` em `ExtendedBlockStorage`, 512 bytes por seção com algum bloco
+waterlogged, as costuras de leitura e escrita, a fila própria de ticks.
+
+O que passa a ser código nosso:
+
+| Função | Antes (ChunkAPI) | Agora |
+|---|---|---|
+| Salvar e carregar | `SubChunkDataManager` | `ChunkDataEvent.Save` / `ChunkDataEvent.Load` do Forge: uma lista `NeoStates` no NBT `Level`, um item por seção com bit (`Y` com sinal + 512 bytes) |
+| Chunk inteiro para o cliente | `PacketDataManager` | pacote próprio enviado em `ChunkWatchEvent.Watch`, só para chunks que têm algum bit |
+| Mudança de célula | `BlockPacketDataManager` | pacote próprio para quem observa o chunk, enviado quando o bit muda |
+| Seções de Y < 0 | automático | alcançadas por `BellowAPI.getDeepSection(chunk, sectionY)` ao salvar, carregar e enviar (dependência opcional, por reflexão) |
+| Cópia para as threads de meshing do Angelica | automático (`cloneSubChunk`) | um mixin tardio em `ExtendedBlockStorageExt.copyFrom` que copia o campo, ou leitura do mundo vivo por `IBlockAccessExtended.getWorld()` (a decidir na fase de render) |
+| Aviso de desinstalação | automático | não há; sem o mod, a lista `NeoStates` do NBT é ignorada e a água hospedada some |
+
+Custos desta escolha, para ficarem registrados:
+
+* **O ChunkAPI continua no pack** (EndlessIDs e BelowCore exigem). A decisão tira a dependência do Neo States, não a
+  presença do mod: os pacotes de chunk continuam sendo os que ele reescreve, e o nosso dado viaja ao lado, em pacotes
+  nossos.
+* **Ordem de chegada no cliente.** O dado da camada chega num pacote separado do `S21` / `S26`. Um chunk reenviado
+  inteiro recria as seções no cliente e apaga o campo; o servidor precisa reenviar a camada junto. O Hodgepodge
+  reenvia chunks com `new S21PacketChunkData(chunk, true, 0xFFFF)` **sem** disparar `ChunkWatchEvent`: esse caminho
+  precisa de um gancho próprio.
+* **Y < 0** deixa de ser automático e passa a depender da API do BelowCore e da ordem dos eventos.
+* Mais código nosso em salvar e sincronizar, que é onde um erro corrompe ou dessincroniza.
+
+Verificações novas:
+
+* **[A VERIFICAR]** `ChunkDataEvent.Load` dispara depois de o BelowCore recriar as seções profundas (ele carrega pelo
+  ChunkAPI dentro de `AnvilChunkLoader`).
+* **[A VERIFICAR]** `ChunkDataEvent.Save` / `Load` no Crucible (salvamento assíncrono de chunk).
+* **[A VERIFICAR]** todos os caminhos que mandam um chunk inteiro: `ChunkWatchEvent.Watch`, o reenvio do Hodgepodge,
+  o `S21` só de seções profundas do BelowCore, troca de dimensão e respawn.
+* **[A VERIFICAR]** pacote próprio atravessando Velocity + ProtocolObelisk (canal de `FMLProxyPacket`).
 
 ## O problema, reenunciado
 
