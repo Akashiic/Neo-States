@@ -147,6 +147,19 @@ não usa: sob o Angelica 2.2.43 o fluido de um bloco fluidlogged não é desenha
 * A face lateral da água fica recuada `0.001` (comportamento do `renderBlockLiquid`), então a parte coberta pela
   laje fica atrás dela. Não há formas de oclusão no 1.7.10; aceitar esse resultado na primeira versão.
 
+**Implementado na Fase 5**, com dois ajustes em relação ao texto acima, vindos do teste no pack
+([TESTES.md](../TESTES.md)):
+
+* o gancho de `WorldRenderer.updateRenderer` não usa a posição: todo bloco que **pode** conter água pede o passe 1
+  (custa rodar o passe translúcido em seções com lajes ou cercas, só no vanilla). E ele só é carregado sem o Angelica,
+  que reescreve essa mesma chamada;
+* a face da água contra um vizinho com água é resolvida ajustando o **resultado** de
+  `BlockLiquid.shouldSideBeRendered`, não a leitura de bloco dentro dele.
+
+**Dado na thread de meshing (implementado).** Além do acesso ao `WorldSlice`, foi preciso um segundo mixin tardio,
+em `ExtendedBlockStorageExt.copyFrom`: sem o ChunkAPI como dono do dado, a cópia de seção do Angelica não leva o campo
+sozinha. O texto original:
+
 **Dado na thread de meshing.** A cópia da seção já traz a camada (o Angelica clona pelo ChunkAPI). Falta alcançá-la a
 partir do `IBlockAccess`: o `WorldSlice` guarda as cópias num array privado. É preciso um mixin tardio de **acesso**
 (`@Accessor` para `sections`, `baseX/Y/Z`), no mesmo estilo dos que o BelowCore já tem em `WorldSlice`. O arquivo

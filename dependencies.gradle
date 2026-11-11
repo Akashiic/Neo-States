@@ -14,3 +14,8 @@ tasks.withType(Test).configureEach {
         exceptionFormat 'full'
     }
 }
+
+dependencies {
+    // Only to compile the two late mixins that hand the waterlogging layer to Angelica's meshing threads.
+    compileOnly("com.github.GTNewHorizons:Angelica:2.2.43:dev") { transitive = false }
+}

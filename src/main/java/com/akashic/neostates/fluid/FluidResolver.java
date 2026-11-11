@@ -2,15 +2,14 @@ package com.akashic.neostates.fluid;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
 
 import com.akashic.neostates.api.FluidView;
-import com.akashic.neostates.water.WaterLayer;
+import com.akashic.neostates.water.WaterSeams;
 
 /**
  * What fluid a cell has: a block whose material is water or lava, with its metadata as the level (this covers Et
- * Futurum's bubble column, which is water material with metadata 0 or 8); else the waterlogging layer, when the
- * access is a world. Chunk caches and the meshing slices do not see the layer yet (phase 5).
+ * Futurum's bubble column, which is water material with metadata 0 or 8); else the waterlogging layer, for a world, a
+ * chunk cache or Angelica's meshing slice.
  */
 public final class FluidResolver {
 
@@ -25,7 +24,7 @@ public final class FluidResolver {
         if (material == Material.lava) {
             return FluidView.ofLegacy(FluidView.TYPE_LAVA, access.getBlockMetadata(x, y, z));
         }
-        if (access instanceof World && WaterLayer.get((World) access, x, y, z)) {
+        if (WaterSeams.hosted(access, x, y, z, access.getBlock(x, y, z))) {
             return FluidView.hostedWater();
         }
         return FluidView.EMPTY;

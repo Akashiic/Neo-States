@@ -1,7 +1,5 @@
 package com.akashic.neostates.water;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockEnderChest;
@@ -29,20 +27,19 @@ public final class WaterHolders {
         BlockWall.class, BlockTrapDoor.class, BlockLadder.class, BlockSign.class, BlockChest.class,
         BlockEnderChest.class };
 
-    private static final ConcurrentHashMap<Block, Boolean> cache = new ConcurrentHashMap<>();
-
     private WaterHolders() {}
 
     public static boolean canHold(Block block) {
         if (block == Blocks.air) {
             return false;
         }
-        Boolean known = cache.get(block);
-        if (known == null) {
-            known = compute(block);
-            cache.put(block, known);
+        HolderFlag flag = (HolderFlag) block;
+        byte known = flag.neostates$holder();
+        if (known == 0) {
+            known = compute(block) ? (byte) 2 : (byte) 1;
+            flag.neostates$holder(known);
         }
-        return known;
+        return known == 2;
     }
 
     private static boolean compute(Block block) {

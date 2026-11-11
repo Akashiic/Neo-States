@@ -46,6 +46,21 @@ public abstract class MixinBlockLiquid_Water extends Block {
         return hosted.get() ? 0 : original.call(world, x, y, z);
     }
 
+    /**
+     * The flow vector asks whether its own cell is a falling column by its metadata. In a hosted cell that metadata
+     * is the host's (a top slab is 8 and above), and the water there is a source.
+     */
+    @WrapOperation(
+        method = "getFlowVector",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/IBlockAccess;getBlockMetadata(III)I"))
+    private int neostates$ownCellIsASource(IBlockAccess access, int x, int y, int z, Operation<Integer> original) {
+        Block block = access.getBlock(x, y, z);
+        if (block.getMaterial() != Material.water && WaterSeams.hosted(access, x, y, z, block)) {
+            return 0;
+        }
+        return original.call(access, x, y, z);
+    }
+
     @WrapOperation(
         method = "getEffectiveFlowDecay",
         at = @At(

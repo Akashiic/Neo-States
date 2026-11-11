@@ -180,7 +180,9 @@ estruturas geradas dentro d'água devem nascer waterlogged; se o `waterSourceCon
 
 | 4 | Camada C, comportamento: blocos que podem conter água, colocar, quebrar, balde, consultas de fluido do mundo e das entidades, câmera, espalhamento da fonte hospedada; API 3; `/neostates autoteste` |
 
-O que foi verificado até a Fase 4:
+| 5 | Camada C, render: a água hospedada é desenhada pelo renderizador de líquidos vanilla no passe translúcido; a camada chega ao `ChunkCache` e às threads de meshing do Angelica |
+
+O que foi verificado até a Fase 5:
 
 * build e 28 testes;
 * servidor de desenvolvimento (Forge, Java 21) sobe até `Done` com o mod;
@@ -196,7 +198,9 @@ O que foi verificado até a Fase 4:
 * **Fase 4 no pack real**: as 30 regras do autoteste passam no Crucible; jogador dentro de água hospedada conta como
   na água e ganha a névoa.
 
-Continuam **[A VERIFICAR]**: shaders, biomas com cor própria, os plugins e o proxy.
+* **Fase 5 no pack real**: blocos com água desenhados no Angelica, dentro de um lago e no ar.
+
+Continuam **[A VERIFICAR]**: o desenho sem Angelica, shaders, biomas com cor própria, os plugins e o proxy.
 
 ## Ordem proposta
 

@@ -21,7 +21,13 @@ public final class WaterSeams {
 
     /** Whether the cell's block (already read by the caller) shares the cell with water. */
     public static boolean hosted(IBlockAccess access, int x, int y, int z, Block block) {
-        return access instanceof World && WaterHolders.canHold(block) && WaterLayer.get((World) access, x, y, z);
+        if (!WaterHolders.canHold(block)) {
+            return false;
+        }
+        if (access instanceof World) {
+            return WaterLayer.get((World) access, x, y, z);
+        }
+        return access instanceof WaterView && ((WaterView) access).neostates$water(x, y, z);
     }
 
     /** The block a fluid query should see: water when the cell holds it, else the block that is there. */

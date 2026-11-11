@@ -117,6 +117,36 @@ O que esta fase **não** faz ou não testou:
   não a veem até passarem a usar a API.
 * `ChunkCache` e o Angelica não enxergam a camada: nada é desenhado.
 
+## Fase 5 (2026-11-11): desenhar a água hospedada
+
+Neo States `0.1.0-alpha.5`, cliente TEOF 5.4 com Angelica 2.2.43 (sem shaders) no Crucible.
+
+| Verificação | Resultado |
+|---|---|
+| Autoteste das 30 regras no Crucible com a versão nova | passou |
+| Laje (de baixo e de cima), escada, cerca, painel de vidro, muro e baú colocados dentro de um lago | todos `hospedada=true`; a superfície do lago fica contínua em volta deles e os blocos aparecem por baixo da água ([imagem](evidencias/fase-5/blocos-com-agua-no-lago-angelica.jpg)) |
+| Os mesmos blocos numa prateleira no ar, com água ligada à mão | a água é desenhada em volta de cada um e cai em cascata ([imagem](evidencias/fase-5/prateleira-com-cascata-angelica.jpg)) |
+| A camada chega às threads de meshing do Angelica | sim: os dois mixins tardios (`ExtendedBlockStorageExt.copyFrom`, `WorldSlice`) aplicam e o desenho acompanha as mudanças |
+
+Duas injeções obrigatórias falharam no pack na primeira tentativa, e o cliente **não subiu** (é a falha fechada):
+
+1. `BlockLiquid.shouldSideBeRendered`: no pack a leitura de bloco dentro do método já não é a chamada vanilla. Passou
+   a ajustar o **resultado** do método, que não depende do corpo.
+2. `WorldRenderer.updateRenderer`: o Angelica reescreve a chamada que o gancho envolve, num método que ele nem usa. O
+   gancho agora só é carregado sem o Angelica.
+
+Fica a lição para as próximas costuras de cliente: o corpo dos métodos de render no pack não é o do vanilla; preferir
+ganchos de entrada, de saída ou de resultado.
+
+Não executado nesta fase:
+
+* **cliente sem Angelica dentro de um mundo**: o cliente de desenvolvimento sobe até o menu com os mixins carregados,
+  mas o gancho de `WorldRenderer` só é aplicado quando o mundo abre. O desenho no vanilla puro continua
+  **[A VERIFICAR]**;
+* shaders: a água hospedada é marcada como água para o shaderpack (`Iris.setShaderMaterialOverride`), sem teste;
+* blocos de mods que sobrescrevem `canRenderInPass` (a água deles não é desenhada, por desenho);
+* ordenação de translúcidos com vários blocos com água em fila.
+
 ## Não executado até aqui
 
 Das Fases 1 e 2:
