@@ -32,7 +32,7 @@ public final class WaterHolders {
     private WaterHolders() {}
 
     public static boolean canHold(Block block) {
-        if (block == Blocks.air) {
+        if (block == Blocks.air || !NeoConfig.waterlogging) {
             return false;
         }
         HolderFlag flag = (HolderFlag) block;
@@ -45,9 +45,6 @@ public final class WaterHolders {
     }
 
     private static boolean compute(Block block) {
-        if (!NeoConfig.waterlogging) {
-            return false;
-        }
         if (block.getMaterial()
             .isLiquid() || block.isOpaqueCube()) {
             return false;

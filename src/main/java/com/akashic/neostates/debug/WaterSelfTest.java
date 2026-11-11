@@ -269,5 +269,79 @@ public final class WaterSelfTest {
                 "sobe a 0.175 por tick com o pulo (ficou em " + String.format("%.4f", swimmer.motionY + 0.04D) + ")",
                 swimmer.isInWater() && Math.abs(swimmer.motionY - 0.135D) < 0.005D);
         }
+
+        // 12. a holder between two sources, over a solid block, fills up (1.21.1's rule for new sources)
+        clear(true);
+        x = this.bx + 4;
+        z = this.bz + 1;
+        w.setBlock(x, y, z, Blocks.stone_slab, 0, 2);
+        w.setBlock(x - 1, y, z, Blocks.water, 0, 2);
+        WaterTicks.spreadNow(w, x, y, z);
+        check("laje com uma fonte ao lado continua seca", !logged(x, y, z));
+        w.setBlock(x + 1, y, z, Blocks.water, 0, 2);
+        WaterTicks.spreadNow(w, x, y, z);
+        check("laje entre duas fontes, sobre bloco sólido, enche", logged(x, y, z));
+
+        // 13. old light under water is brought up to date: 1 less per block of water, straight down and sideways
+        clear(true);
+        relightCheck();
+    }
+
+    /**
+     * A shaft of water in stone, open to the sky, with one cell of water in its wall. Its sky light is overwritten
+     * with what a world generated with water taking 3 per block has; the relight has to bring it to 1 per block.
+     */
+    private void relightCheck() {
+        World w = this.world;
+        int x = this.bx + 4;
+        int z = this.bz + 4;
+        int top = this.by + 6;
+        int opacity = Blocks.water.getLightOpacity();
+        if (w.provider.hasNoSky || opacity != 1) {
+            this.lines.add("--    luz: sem céu ou água com opacidade " + opacity + ", não se aplica");
+            return;
+        }
+        for (int h = 1; h <= 6; h++) {
+            for (int dx = -2; dx <= 2; dx++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    w.setBlock(x + dx, this.by + h, z + dz, Blocks.stone, 0, 2);
+                }
+            }
+            w.setBlock(x, this.by + h, z, Blocks.water, 0, 2);
+        }
+        int pocketY = this.by + 2;
+        w.setBlock(x - 1, pocketY, z, Blocks.water, 0, 2);
+        int open = w.getSavedLightValue(net.minecraft.world.EnumSkyBlock.Sky, x, top + 1, z);
+        net.minecraft.world.chunk.Chunk chunk = w.getChunkFromBlockCoords(x, z);
+        for (int h = 1; h <= 6; h++) {
+            int depth = 7 - h;
+            setSky(chunk, x, this.by + h, z, Math.max(0, open - 3 * depth));
+        }
+        setSky(chunk, x - 1, pocketY, z, 0);
+        int raised = com.akashic.neostates.light.WaterRelight.relightNow(w, x >> 4, z >> 4);
+        if (raised < 0) {
+            this.lines.add("--    luz: os chunks em volta não estão carregados, não se aplica");
+        } else {
+            boolean column = true;
+            StringBuilder got = new StringBuilder();
+            for (int h = 6; h >= 1; h--) {
+                int light = w.getSavedLightValue(net.minecraft.world.EnumSkyBlock.Sky, x, this.by + h, z);
+                got.append(light)
+                    .append(h > 1 ? "," : "");
+                column &= light == Math.max(0, open - (7 - h));
+            }
+            check("luz do céu desce 1 por bloco de água (do topo: " + got + ", céu " + open + ")", column);
+            int pocket = w.getSavedLightValue(net.minecraft.world.EnumSkyBlock.Sky, x - 1, pocketY, z);
+            check("luz entra de lado na água vizinha (ficou " + pocket + ")", pocket == Math.max(0, open - 6));
+            check(
+                "o chunk refeito fica marcado",
+                ((com.akashic.neostates.light.LightMark) chunk).neostates$lightMark() == 1);
+        }
+        clear(true);
+    }
+
+    private static void setSky(net.minecraft.world.chunk.Chunk chunk, int x, int y, int z, int value) {
+        net.minecraft.world.chunk.storage.ExtendedBlockStorage section = chunk.getBlockStorageArray()[y >> 4];
+        section.setExtSkylightValue(x & 15, y & 15, z & 15, value);
     }
 }

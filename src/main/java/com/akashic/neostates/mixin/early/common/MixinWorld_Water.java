@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.akashic.neostates.core.Targets;
+import com.akashic.neostates.water.WaterHolders;
 import com.akashic.neostates.water.WaterLayer;
 import com.akashic.neostates.water.WaterSeams;
 import com.akashic.neostates.water.WaterTicks;
@@ -53,7 +54,12 @@ public abstract class MixinWorld_Water {
     @Inject(method = "notifyBlockOfNeighborChange(IIILnet/minecraft/block/Block;)V", at = @At("HEAD"))
     private void neostates$wakeHostedWater(int x, int y, int z, Block neighbor, CallbackInfo ci) {
         World self = (World) (Object) this;
-        if (!this.isRemote && WaterLayer.get(self, x, y, z)) {
+        if (this.isRemote) {
+            return;
+        }
+        // a hosted source may flow; a dry holder beside new water may fill (the two-source rule)
+        if (WaterLayer.get(self, x, y, z)
+            || neighbor.getMaterial() == Material.water && WaterHolders.canHold(self.getBlock(x, y, z))) {
             WaterTicks.schedule(self, x, y, z);
         }
     }

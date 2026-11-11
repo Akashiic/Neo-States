@@ -228,6 +228,9 @@ Nenhum mixin em `handleWaterMovement`, `isInWater`, `isInsideOfMaterial`, `handl
 
 No Crucible, toda entrada com `addExcludedMod(TargetedMod.BUKKIT)` fica desligada no servidor.
 
+A opção `useLighterWater` do Hodgepodge faz o mesmo que `modernWaterLight` (opacidade 1). Com qualquer uma das duas
+ligada, a migração de luz dos chunks antigos (`relightOldChunks`) vale.
+
 ## Et Futurum Requiem
 
 O mod que mais sobrepõe o escopo do Neo States.
@@ -291,6 +294,12 @@ Crucible, ou a proteção fura.
 
 O `PlayerContainerFix` do TEOF deixa `org.bukkit.World` com tipos ofuscados (nota do AkashicFishing): nada de
 `getMethod` em classes Bukkit.
+
+### Luz
+
+O `World.updateLightByType` do Crucible pode rodar numa thread própria (`use-async-lighting` do `spigot.yml`, herdado
+do PaperSpigot). A migração de luz do Neo States não passa por ele: escreve os arrays de luz das seções na thread do
+mundo e manda a luz nova aos clientes num pacote próprio (`MessageLight`), sem reenviar o chunk.
 
 ## Velocity + ProtocolObelisk
 

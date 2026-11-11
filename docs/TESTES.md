@@ -185,6 +185,67 @@ Não executado:
 * **pesca**: o anzol do Kunftig com a ponte não foi lançado;
 * o empurrão da correnteza num jogador (a fórmula tem teste unitário; em jogo, não).
 
+## Fase 7 e pendências da Fase 6 (2026-11-11)
+
+Neo States `0.1.0-alpha.7`, Akashic Player `0.1.0-alpha.30-push-rc1` (candidata) e Kunftig `0.1.0-dev-neostates`, nos
+dois lados, no TEOF 5.4 com o Crucible.
+
+### Luz dos chunks antigos
+
+| Verificação | Resultado |
+|---|---|
+| Algoritmo contra o cálculo do zero (teste unitário, 60 mundos aleatórios com cavernas, água e lâmpadas) | idêntico |
+| Autoteste: coluna de água com a luz de um mundo antigo (3 por bloco) refeita | `14,13,12,11,10,9` do topo, céu 15 |
+| Autoteste: a luz entra de lado numa célula de água vizinha | passou (9) |
+| Primeiro boot com o mundo do servidor | 529 chunks refeitos, 120.406 células clareadas, 363 ms no total (0,7 ms por chunk) |
+| Segundo boot | 0 refeitos na área do spawn: a marca `NeoStates.Light` foi salva e lida |
+| Cliente que já tem o chunk recebe a luz nova | `Relit water light from the server` no log do cliente |
+| Fundo do lago | luz 11 a 4 blocos de profundidade ([imagem](evidencias/fase-7/luz-fundo-do-lago.jpg)) |
+
+O anel mais externo de chunks carregados em volta de um jogador parado fica na fila: um chunk só é refeito com os oito
+vizinhos carregados. É refeito quando o jogador chega mais perto.
+
+### Opções do servidor no cliente
+
+`Following the server: water physics true, water light true, waterlogging true.` no log do cliente ao entrar.
+Servidor sem o Neo States (as três desligadas no cliente): **não testado**.
+
+### Física com um jogador de verdade
+
+Medido no servidor com `/neostates rastro` (as posições que o cliente manda), teclado pelo `xdotool`. O cliente roda
+em renderização por software e os pacotes de posição não vêm um por tick, então são médias:
+
+| Movimento | Medido | 1.21.1 | 1.7.10 |
+|---|---|---|---|
+| Parado, afundando | 0,026 por tick | 0,025 | 0,100 |
+| Segurando o pulo | ~0,15 por tick | 0,135 | 0,135 |
+| Agachado | ~0,18 por tick | 0,185 | 0,100 |
+
+Nadar correndo, pulo no raso e empurrão da correnteza num jogador: **não testados**.
+
+### Fluxo e plugin
+
+Com um plugin de teste que cancela o `BlockFromToEvent` (fora do repositório): a água posta numa laje tentou os quatro
+lados, os quatro eventos foram cancelados e nada escorreu; com o plugin desligado, a mesma laje escorreu. Um plugin de
+proteção de verdade (WorldGuard e afins): **não testado**.
+
+Autoteste: laje com uma fonte ao lado fica seca; entre duas fontes, sobre bloco sólido, enche.
+
+### Pesca
+
+Vara vanilla, anzol do Kunftig: em água normal e sobre lajes com água, a boia fica na superfície
+([imagem](evidencias/fase-7/pesca-boia-na-superficie.jpg)). Mordida, fisgada e o AkashicFishing: **não testados**.
+
+### Colisão (Akashic Player Backport)
+
+Com o jogador parado no chão, um porco invocado em cima dele o empurrou 0,34 bloco para o lado oposto em 7 ticks, até
+se separarem. Antes, no 1.7.10, o jogador não se movia. Jogador contra jogador (precisa de dois clientes) e as regras
+de time: **não testados** em jogo.
+
+### Autoteste
+
+40 verificações, `RESULTADO: PASSOU` no Crucible, em dois lugares do mundo.
+
 ## Não executado até aqui
 
 Das Fases 1 e 2:

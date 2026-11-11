@@ -9,11 +9,25 @@ public final class WaterBits {
 
     public static final int LONGS = 64;
     public static final int BYTES = LONGS * 8;
+    /** Cells of a section. */
+    public static final int CELLS = 4096;
 
     private WaterBits() {}
 
     public static int index(int x, int y, int z) {
         return (y & 15) << 8 | (z & 15) << 4 | x & 15;
+    }
+
+    public static int x(int index) {
+        return index & 15;
+    }
+
+    public static int y(int index) {
+        return index >> 8 & 15;
+    }
+
+    public static int z(int index) {
+        return index >> 4 & 15;
     }
 
     public static boolean get(long[] bits, int index) {

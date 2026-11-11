@@ -19,6 +19,12 @@ Implementação própria, sem depender do FluidLogged, cobrindo as lacunas dele 
 
 > A parte "deixar a persistência e a sincronização com o ChunkAPI" foi **revogada** pela Revisão 1 abaixo.
 
+## Revisão 2: marca de luz
+
+O mesmo composto `NeoStates` do NBT do chunk guarda `Light` (byte): a opacidade da água com que a luz do chunk foi
+calculada. Um chunk lido do disco sem a marca é tido como de antes da mudança e tem a luz da água refeita uma vez
+(`light/WaterRelight`). Um composto só com `Light` é válido; `Water` passa a ser opcional.
+
 ## Revisão 1: sem ChunkAPI
 
 Decisão do dono (Fase 1): o Neo States não declara dependência do ChunkAPI nem do FalsePatternLib.

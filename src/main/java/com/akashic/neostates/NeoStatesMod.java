@@ -1,6 +1,5 @@
 package com.akashic.neostates;
 
-import net.minecraft.init.Blocks;
 import net.minecraftforge.common.MinecraftForge;
 
 import org.apache.logging.log4j.LogManager;
@@ -8,6 +7,8 @@ import org.apache.logging.log4j.Logger;
 
 import com.akashic.neostates.debug.CommandNeoStates;
 import com.akashic.neostates.fluid.FluidPipeline;
+import com.akashic.neostates.light.WaterLight;
+import com.akashic.neostates.light.WaterRelight;
 import com.akashic.neostates.net.WaterNet;
 import com.akashic.neostates.water.WaterBuckets;
 import com.akashic.neostates.water.WaterSave;
@@ -39,18 +40,26 @@ public class NeoStatesMod {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
-        if (NeoConfig.modernWaterLight) {
-            // 1.21.1: water dims light by 1 per block. Both sides compute light, so both need the same value.
-            Blocks.water.setLightOpacity(1);
-            Blocks.flowing_water.setLightOpacity(1);
-        }
+        WaterLight.init(NeoConfig.modernWaterLight);
         WaterNet.init();
-        MinecraftForge.EVENT_BUS.register(new WaterNet());
+        WaterNet net = new WaterNet();
+        MinecraftForge.EVENT_BUS.register(net);
+        FMLCommonHandler.instance()
+            .bus()
+            .register(net);
+        WaterRelight relight = new WaterRelight();
+        MinecraftForge.EVENT_BUS.register(relight);
+        FMLCommonHandler.instance()
+            .bus()
+            .register(relight);
         MinecraftForge.EVENT_BUS.register(new WaterSave());
         MinecraftForge.EVENT_BUS.register(new WaterBuckets());
         FMLCommonHandler.instance()
             .bus()
             .register(new WaterTicks());
+        FMLCommonHandler.instance()
+            .bus()
+            .register(new com.akashic.neostates.debug.MotionTrace());
         proxy.init();
     }
 

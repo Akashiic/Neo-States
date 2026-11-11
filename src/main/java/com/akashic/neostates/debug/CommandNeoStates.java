@@ -24,7 +24,7 @@ public class CommandNeoStates extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "/neostates sonda | agua <x> <y> <z> <on|off> | ler <x> <y> <z> | autoteste [<x> <y> <z>]";
+        return "/neostates sonda | agua <x> <y> <z> <on|off> | ler <x> <y> <z> | autoteste [<x> <y> <z>] | luz | rastro <jogador> <ticks>";
     }
 
     @Override
@@ -50,6 +50,15 @@ public class CommandNeoStates extends CommandBase {
                     + ": "
                     + (on ? "ligada" : "desligada")
                     + (changed ? "" : " (sem mudança)"));
+            return;
+        }
+        if (args.length == 3 && "rastro".equals(args[0])) {
+            MotionTrace.start(getPlayer(sender, args[1]), parseIntBounded(sender, args[2], 1, 1200));
+            say(sender, "rastro iniciado; as linhas vão para o log do servidor");
+            return;
+        }
+        if (args.length == 1 && "luz".equals(args[0])) {
+            say(sender, com.akashic.neostates.light.WaterRelight.status(sender.getEntityWorld()));
             return;
         }
         if (args.length == 1 && "autoteste".equals(args[0])) {

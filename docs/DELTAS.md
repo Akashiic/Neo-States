@@ -167,6 +167,16 @@ Player Backport), bolhas e itens flutuando (já são do Et Futurum).
 Portados e ligados por `modernWaterPhysics`: A-5, A-6, A-7, C-1, C-2, C-4, C-5, C-6, D-3, D-5, D-7. Portado e ligado
 por `modernWaterLight`: G-11. Continuam de fora: B-4, E-6, E-8 (além do caso hospedado), G-8, G-9.
 
+G-11 tem duas partes. A opacidade muda o que é calculado dali em diante; a luz **guardada** nos chunks já gerados só
+muda onde um bloco muda, então um mundo antigo ficaria escuro debaixo d'água para sempre. Por isso cada chunk antigo
+tem a luz da água refeita uma vez, ao carregar (`relightOldChunks`). Só clareia: desligar `modernWaterLight` depois
+não escurece o que já foi refeito. Um bloco com água (cerca, painel) não ganha a opacidade 1 que tem no 1.21.1: fica
+com a do próprio bloco; lajes e escadas do 1.7.10 já barram a luz inteira, com ou sem água.
+
+Na Fase 7 entrou a regra das fontes novas para blocos que contêm água (`FlowingFluid.getNewLiquid`): entre duas
+fontes, sobre bloco sólido ou fonte, o bloco enche. O 1.21.1 também olha a forma do bloco para decidir se a água
+passa por uma face; aqui a forma não é considerada.
+
 O empurrão de um jogador depende de a física rodar no cliente (no 1.7.10 o cliente é quem move o jogador): a opção
 tem de ter o mesmo valor nos dois lados.
 

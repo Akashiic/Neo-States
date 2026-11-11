@@ -184,7 +184,9 @@ estruturas geradas dentro d'água devem nascer waterlogged; se o `waterSourceCon
 
 | 6 | Camada B: "na água", olhos e câmera pela superfície real; empurrão da correnteza, afundamento, regra do pulo e descida agachado do 1.21.1; luz da água; evento de fluxo do Bukkit; opções para desligar cada parte |
 
-O que foi verificado até a Fase 6:
+| 7 | API 4 documentada ([API.md](API.md)) e usada pelo Player Backport e pelo Kunftig; luz da água refeita nos chunks antigos; opções do servidor seguidas pelo cliente; regra das duas fontes em blocos que contêm água; fluxo reagendado ao carregar o chunk |
+
+O que foi verificado até a Fase 7:
 
 * build e 28 testes;
 * servidor de desenvolvimento (Forge, Java 21) sobe até `Done` com o mod;
@@ -204,8 +206,11 @@ O que foi verificado até a Fase 6:
 
 * **Fase 6 no pack real**: 35 verificações do autoteste no Crucible; o contrato do Player Backport mantido.
 
-Continuam **[A VERIFICAR]**: nadar e pescar de verdade no cliente, um plugin de proteção barrando o fluxo, o desenho
-sem Angelica, shaders, biomas com cor própria, os plugins e o proxy.
+* **Fase 7 no pack real**: 40 verificações do autoteste; luz refeita em 529 chunks do mundo do servidor; afundar,
+  subir e descer medidos com um jogador; boia do Kunftig na superfície de água em lajes; fluxo barrado por plugin.
+
+Continuam **[A VERIFICAR]**: nadar correndo e o empurrão da correnteza num jogador, mordida e fisgada em água
+hospedada, um plugin de proteção de verdade, o desenho sem Angelica, shaders, biomas com cor própria, os plugins e o proxy.
 
 ## Ordem proposta
 

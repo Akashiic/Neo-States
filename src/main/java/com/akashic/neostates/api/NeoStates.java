@@ -23,7 +23,7 @@ public final class NeoStates {
      * ({@link #isWaterlogged}, {@link #setWaterlogged}). 3: {@link #canHoldWater}; {@code setWaterlogged} refuses a
      * block that may not hold water.
      */
-    public static final int API_VERSION = 3;
+    public static final int API_VERSION = 4;
 
     private NeoStates() {}
 
@@ -41,6 +41,13 @@ public final class NeoStates {
     }
 
     /** Whether the cell holds water next to its block (the layer's bit; false for a plain water block). */
+    /**
+     * Whether the cell is a water source: a water block at level 0, or a block that holds water. Since API 4.
+     */
+    public static boolean isSourceAt(World world, int x, int y, int z) {
+        return com.akashic.neostates.water.WaterTicks.isSource(world, x, y, z);
+    }
+
     public static boolean isWaterlogged(World world, int x, int y, int z) {
         return WaterLayer.get(world, x, y, z);
     }
