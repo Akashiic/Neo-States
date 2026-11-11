@@ -77,6 +77,46 @@ Limites desta fase, de propósito:
 
 Não executado nesta fase: o caminho de reenvio de chunk do Hodgepodge, troca de dimensão, e o proxy.
 
+## Fase 4 (2026-11-11): o waterlogging passa a valer
+
+Neo States `0.1.0-alpha.4`. A água hospedada ainda **não é desenhada** (Fase 5); o que foi testado é o comportamento.
+
+`/neostates autoteste` monta uma plataforma de pedra na área de spawn e confere 30 regras dentro do servidor. Rodou no
+servidor de desenvolvimento e no **Crucible real com o pack inteiro**: `RESULTADO: PASSOU` (30 de 30) nos dois.
+
+| Grupo | Regras conferidas |
+|---|---|
+| API | laje aceita água; `fluidAt` diz fonte hospedada; pedra recusa |
+| Consultas do mundo | `isAnyLiquid`, `isMaterialInBB` (água sim, lava não), `isAABBInMaterial`, `handleMaterialAcceleration`, `isInsideOfMaterial` veem a água hospedada, e deixam de ver sem o bit |
+| TileEntity | baú com item: mesma TileEntity, NBT idêntico, bloco e metadata intactos com água |
+| Colocar e remover | laje posta em água fonte nasce com água; em água corrente fica seca; bloco cheio tira a água; `setBlock(ar)` remove tudo; quebrar (`setBlockToAir`) deixa água fonte |
+| Balde | balde de água enche uma escada; balde vazio tira; em bloco comum vale a regra vanilla |
+| Espalhar | fonte hospedada sobre o vazio cai; no chão vai para os lados; o hospedeiro não é alterado; a água vizinha continua alimentada e seca quando a fonte some |
+
+No cliente do pack (Angelica), conectado ao Crucible, com o jogador dentro de uma laje e de uma escada de mão com
+água: `/neostates sonda` respondeu `pés … água nível 8 fonte hospedada`, `na água: vanilla=true`,
+`olhos na água: vanilla=true`, e a câmera ganhou a névoa submersa
+([imagem](evidencias/fase-4/camera-em-agua-hospedada.jpg)). A água da escada caiu para a célula de baixo sozinha, como
+uma fonte.
+
+Isso também confere, no bytecode real do Crucible, os alvos de `Chunk.func_150807_a`, `World.setBlockToAir`,
+`notifyBlockOfNeighborChange`, as quatro consultas de fluido de `World`, `Entity.isInsideOfMaterial`,
+`BlockLiquid.func_149804_e` / `getEffectiveFlowDecay` e os três métodos privados de `BlockDynamicLiquid`: todas as
+injeções são obrigatórias e o servidor subiu.
+
+O que esta fase **não** faz ou não testou:
+
+* **`BlockFromToEvent` não é disparado** quando a água hospedada espalha. Com um plugin de proteção, esse fluxo
+  atravessaria regiões protegidas. Tem de entrar antes de usar em produção.
+* A fila de ticks da água hospedada não é salva: depois de reiniciar, a fonte só volta a correr na próxima mudança
+  de vizinho.
+* A regra das 2 fontes não enche um bloco hospedeiro (no 1.21.1 enche).
+* Trilhos ficam de fora (a água corrente do 1.7.10 os quebra).
+* Balde e quebrar foram conferidos chamando as regras por código, não com um jogador clicando.
+* O Player Backport e o Kunftig ainda leem o bloco direto: o **início** do nado dentro de água hospedada e o anzol
+  não a veem até passarem a usar a API.
+* `ChunkCache` e o Angelica não enxergam a camada: nada é desenhado.
+
 ## Não executado até aqui
 
 Das Fases 1 e 2:

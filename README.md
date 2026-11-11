@@ -9,9 +9,10 @@ servidor Crucible em Java 21, clientes em Java 8. Começa pela água, em três c
 | B, física | leitura unificada de altura, movimento do jogador na água |
 | C, estado | waterlogging: blocos parciais com água na mesma célula |
 
-**Estado: Fase 3.** Há a API de leitura de fluido, a Camada A (textura em cinza, cor por bioma, névoa submersa) e os
-dados da Camada C (o bit de água hospedada, salvo e sincronizado, inclusive em Y < 0). O waterlogging ainda não tem
-efeito no jogo. Testado no pack real: [docs/TESTES.md](docs/TESTES.md).
+**Estado: Fase 4.** Há a API de leitura de fluido, a Camada A (textura em cinza, cor por bioma, névoa submersa) e os
+Camada C até o comportamento: lajes, escadas, cercas, muros, painéis, alçapões, escadas de mão, placas e baús podem
+conter água (inclusive em Y < 0), com balde, colocar e quebrar, e a água conta para entidades e espalha. **A água
+hospedada ainda não é desenhada** (próxima fase) e o fluxo dela ainda não avisa plugins de proteção. Testado no pack real: [docs/TESTES.md](docs/TESTES.md).
 
 ```bash
 VERSION=0.1.0-alpha.1 ./gradlew spotlessApply build -x javadoc

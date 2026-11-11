@@ -8,8 +8,11 @@ import org.apache.logging.log4j.Logger;
 import com.akashic.neostates.debug.CommandNeoStates;
 import com.akashic.neostates.fluid.FluidPipeline;
 import com.akashic.neostates.net.WaterNet;
+import com.akashic.neostates.water.WaterBuckets;
 import com.akashic.neostates.water.WaterSave;
+import com.akashic.neostates.water.WaterTicks;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -38,6 +41,10 @@ public class NeoStatesMod {
         WaterNet.init();
         MinecraftForge.EVENT_BUS.register(new WaterNet());
         MinecraftForge.EVENT_BUS.register(new WaterSave());
+        MinecraftForge.EVENT_BUS.register(new WaterBuckets());
+        FMLCommonHandler.instance()
+            .bus()
+            .register(new WaterTicks());
         proxy.init();
     }
 

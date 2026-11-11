@@ -24,7 +24,7 @@ public class CommandNeoStates extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "/neostates sonda | agua <x> <y> <z> <on|off> | ler <x> <y> <z>";
+        return "/neostates sonda | agua <x> <y> <z> <on|off> | ler <x> <y> <z> | autoteste [<x> <y> <z>]";
     }
 
     @Override
@@ -50,6 +50,27 @@ public class CommandNeoStates extends CommandBase {
                     + ": "
                     + (on ? "ligada" : "desligada")
                     + (changed ? "" : " (sem mudança)"));
+            return;
+        }
+        if (args.length == 1 && "autoteste".equals(args[0])) {
+            net.minecraft.util.ChunkCoordinates spawn = sender.getEntityWorld()
+                .getSpawnPoint();
+            // inside one chunk of the spawn area, which the server keeps loaded
+            int sx = (spawn.posX >> 4 << 4) + 3;
+            int sz = (spawn.posZ >> 4 << 4) + 3;
+            for (String line : WaterSelfTest.run(sender.getEntityWorld(), sx, 120, sz)) {
+                say(sender, line);
+            }
+            return;
+        }
+        if (args.length == 4 && "autoteste".equals(args[0])) {
+            for (String line : WaterSelfTest.run(
+                sender.getEntityWorld(),
+                parseInt(sender, args[1]),
+                parseInt(sender, args[2]),
+                parseInt(sender, args[3]))) {
+                say(sender, line);
+            }
             return;
         }
         if (args.length == 4 && "ler".equals(args[0])) {

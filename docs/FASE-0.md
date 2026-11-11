@@ -178,7 +178,9 @@ estruturas geradas dentro d'água devem nascer waterlogged; se o `waterSourceCon
 
 | 3 | Camada C, dados: 1 bit por célula na seção, salvo pelos eventos de chunk do Forge e sincronizado por pacotes próprios; vale em Y < 0; API 2 (`isWaterlogged`, `setWaterlogged`) |
 
-O que foi verificado até a Fase 3:
+| 4 | Camada C, comportamento: blocos que podem conter água, colocar, quebrar, balde, consultas de fluido do mundo e das entidades, câmera, espalhamento da fonte hospedada; API 3; `/neostates autoteste` |
+
+O que foi verificado até a Fase 4:
 
 * build e 28 testes;
 * servidor de desenvolvimento (Forge, Java 21) sobe até `Done` com o mod;
@@ -190,6 +192,9 @@ O que foi verificado até a Fase 3:
 
 * **Fase 3 no pack real**: água hospedada num baú, numa laje e numa laje em Y −5, persistindo a um reinício do
   Crucible e chegando ao cliente.
+
+* **Fase 4 no pack real**: as 30 regras do autoteste passam no Crucible; jogador dentro de água hospedada conta como
+  na água e ganha a névoa.
 
 Continuam **[A VERIFICAR]**: shaders, biomas com cor própria, os plugins e o proxy.
 

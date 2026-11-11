@@ -1,5 +1,6 @@
 package com.akashic.neostates.api;
 
+import net.minecraft.block.Block;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -7,7 +8,9 @@ import com.akashic.neostates.fluid.FluidPipeline;
 import com.akashic.neostates.fluid.FluidResolver;
 import com.akashic.neostates.fluid.HeightKind;
 import com.akashic.neostates.net.WaterNet;
+import com.akashic.neostates.water.WaterHolders;
 import com.akashic.neostates.water.WaterLayer;
+import com.akashic.neostates.water.WaterTicks;
 
 /**
  * What other mods ask Neo States. Small and stable, so it can be called by reflection without a compile dependency.
@@ -17,9 +20,10 @@ public final class NeoStates {
 
     /**
      * 1: fluid reads ({@link #fluidAt}, {@link #isWaterAt}, {@link #surfaceY}). 2: the waterlogging layer
-     * ({@link #isWaterlogged}, {@link #setWaterlogged}).
+     * ({@link #isWaterlogged}, {@link #setWaterlogged}). 3: {@link #canHoldWater}; {@code setWaterlogged} refuses a
+     * block that may not hold water.
      */
-    public static final int API_VERSION = 2;
+    public static final int API_VERSION = 3;
 
     private NeoStates() {}
 
@@ -41,10 +45,15 @@ public final class NeoStates {
         return WaterLayer.get(world, x, y, z);
     }
 
+    /** Whether this block is one that may share its cell with water. */
+    public static boolean canHoldWater(Block block) {
+        return WaterHolders.canHold(block);
+    }
+
     /**
-     * Sets or clears the water held in the cell and tells the players watching it. Server side. Only the layer is
-     * written: the block, its metadata and its tile entity are left exactly as they are. It does not check that the
-     * block is one that may hold water.
+     * Sets or clears the water held in the cell and tells the players around it. Server side. Only the layer is
+     * written: the block, its metadata and its tile entity are left exactly as they are. Water is refused for a
+     * block that may not hold it ({@link #canHoldWater}).
      *
      * @return whether anything changed
      */
@@ -52,9 +61,15 @@ public final class NeoStates {
         if (world.isRemote || !world.blockExists(x, y, z)) {
             return false;
         }
+        if (water && !WaterHolders.canHold(world.getBlock(x, y, z))) {
+            return false;
+        }
         boolean changed = WaterLayer.set(world.getChunkFromBlockCoords(x, z), x, y, z, water);
         if (changed) {
             WaterNet.sendBlock(world, x, y, z, water);
+            if (water) {
+                WaterTicks.schedule(world, x, y, z);
+            }
         }
         return changed;
     }
