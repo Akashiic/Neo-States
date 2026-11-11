@@ -173,7 +173,18 @@ estruturas geradas dentro d'água devem nascer waterlogged; se o `waterSourceCon
 | Fase | Estado |
 |---|---|
 | 0 | concluída |
-| 1 | esqueleto do mod, API de leitura, pipeline de altura, comando `/neostates sonda`, testes de impressão digital: **compila e os testes passam; ainda não foi carregado em jogo nem em servidor** |
+| 1 | esqueleto do mod, API de leitura, pipeline de altura, comando `/neostates sonda`, testes de impressão digital |
+| 2 | Camada A: textura em cinza gerada em tempo de execução, cor por bioma, névoa submersa (opções `modernWaterColor` e `modernWaterFog` em `config/neostates.cfg`) |
+
+O que foi verificado até a Fase 2:
+
+* build e 28 testes;
+* servidor de desenvolvimento (Forge, Java 21) sobe até `Done` com o mod;
+* cliente de desenvolvimento (Java 8, sem tela, renderização por software) sobe até o menu: o mixin de `BlockLiquid`
+  aplica e os dois sprites em cinza carregam (16×512 e 32×1024, 32 quadros cada).
+
+O que **não** foi verificado: nada foi visto dentro de um mundo. A cor da água, a névoa e a textura animada em jogo,
+com e sem Angelica e com shaders, continuam **[A VERIFICAR]**, assim como o Crucible e o pack real.
 
 ## Ordem proposta
 

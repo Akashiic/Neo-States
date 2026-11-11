@@ -147,8 +147,8 @@ Nada disso foi lido na Fase 0. Dois fatos já conhecidos condicionam o trabalho:
   regras de colisão próprias (`CollisionPolicy`, `CollisionRuleSavedData`);
 * o Hodgepodge tira as caixas de entidade da colisão de `EntityItem` (`fastItemEntityPhysics`).
 
-**[A VERIFICAR]** os dois lados no decompilador, e em qual repositório isso mora (a colisão de jogador já é do Player
-Backport).
+Decisão do dono: isso mora no **Akashic Player Backport**; o Neo States pode se ligar a ele se precisar.
+**[A VERIFICAR]** os dois lados no decompilador, lá.
 
 ## Resumo: o que vale portar
 

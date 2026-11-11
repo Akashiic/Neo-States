@@ -9,8 +9,9 @@ servidor Crucible em Java 21, clientes em Java 8. Começa pela água, em três c
 | B, física | leitura unificada de altura, movimento do jogador na água |
 | C, estado | waterlogging: blocos parciais com água na mesma célula |
 
-**Estado: Fase 1.** Há o esqueleto do mod, a API de leitura de fluido e os testes de impressão digital. Nenhum
-comportamento do jogo muda ainda. Não foi carregado em jogo nem em servidor.
+**Estado: Fase 2.** Há a API de leitura de fluido e a Camada A (textura em cinza, cor por bioma, névoa submersa).
+Servidor e cliente de desenvolvimento sobem com o mod; nada foi visto dentro de um mundo ainda (ver
+[docs/FASE-0.md](docs/FASE-0.md#estado)).
 
 ```bash
 VERSION=0.1.0-alpha.1 ./gradlew spotlessApply build -x javadoc

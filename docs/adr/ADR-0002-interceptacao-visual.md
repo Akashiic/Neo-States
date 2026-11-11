@@ -75,8 +75,12 @@ Medido nos jars: a textura do 1.7.10 é azul (`#2F43F4`) com alfa variando de 16
    de poção (`GrayscaleWaterResourcePack`), o que mostra que ela convive com o pack.
 2. Um resource pack opcional do modpack com arte própria.
 
-`BlockLiquid.getIcon` passa a devolver os sprites em cinza para `Material.water` (um `@Inject` cancelável em
-`getIcon(II)`, ou a troca do array privado `field_149806_a` depois do stitch). **[A VERIFICAR]** a interação com o
+`BlockLiquid.getIcon` passa a devolver os sprites em cinza para `Material.water`.
+
+**Implementado na Fase 2** assim: `@Inject` cancelável em `BlockLiquid.getIcon(II)`. O array privado
+`field_149806_a` fica com os ícones azuis de propósito: `BlockLiquid.getLiquidIcon` (caldeirão, o fluido "water" do
+Forge em tanques de mods) não é tingido por bioma e ficaria cinza. O alfa da textura original é mantido (a média do
+1.7.10 é 179; a moderna é 180 fixo), e uma textura que já é cinza no resource pack não é alterada. **[A VERIFICAR]** a interação com o
 `BlockIconTransformer` do GTNHLib, que insere um retorno antecipado em todo `getIcon`.
 
 Quem mais desenha com o ícone da água: o caldeirão, itens de balde em tanques de mods, a coluna de bolhas do Et
