@@ -41,6 +41,7 @@ Num servidor sem o Neo States o cliente as desliga sozinho.
 | Opção | Padrão | Desliga |
 |---|---|---|
 | `visual.modernWaterColor` | `true` | textura em cinza e cor por bioma |
+| `visual.modernWaterOverlay` | `true` | a lateral lisa da água contra vidro, gelo e folhas (precisa de `modernWaterColor`) |
 | `visual.modernWaterFog` | `true` | névoa submersa do 1.21.1 |
 | `physics.modernWaterPhysics` | `true` | "na água" pela superfície real, empurrão, afundamento, pulo, descida agachado |
 | `physics.modernWaterLight` | `true` | a água tirar só 1 de luz por bloco |

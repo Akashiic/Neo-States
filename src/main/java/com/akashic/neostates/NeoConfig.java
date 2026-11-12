@@ -9,6 +9,8 @@ public final class NeoConfig {
 
     /** Grey water texture + 1.21.1 colours per biome. The two go together: one without the other looks wrong. */
     public static boolean modernWaterColor = true;
+    /** 1.21.1's water_overlay: a flat side against glass, ice and leaves. Needs modernWaterColor. */
+    public static boolean modernWaterOverlay = true;
     /** 1.21.1 underwater fog: biome colour, linear distance, the view adapting over time. */
     public static boolean modernWaterFog = true;
 
@@ -64,6 +66,12 @@ public final class NeoConfig {
             "visual",
             true,
             "Agua com a textura em cinza e a cor de cada bioma, como no 1.21.1.");
+        modernWaterOverlay = config.getBoolean(
+            "modernWaterOverlay",
+            "visual",
+            true,
+            "A lateral da agua encostada em vidro, gelo ou folhas usa a textura lisa do 1.21.1 (water_overlay) em vez"
+                + " da textura de agua corrente. Precisa de modernWaterColor.");
         modernWaterFog = config.getBoolean(
             "modernWaterFog",
             "visual",

@@ -6,7 +6,7 @@ Estado em 2026-11-11, ao fim da Fase 10. Nada aqui foi publicado como release ne
 
 | Projeto | Branch | Build testada | Onde instalar |
 |---|---|---|---|
-| Neo States | `claude/friendly-edison-abcr7m` | `0.1.0-alpha.10` | cliente e servidor |
+| Neo States | `claude/friendly-edison-abcr7m` | `0.1.0-alpha.11` | cliente e servidor |
 | Akashic Player Backport | `claude/friendly-edison-abcr7m` | `0.1.0-alpha.30-push-rc1` (candidata) | cliente e servidor |
 | Kunftig | `claude/friendly-edison-abcr7m` | `0.1.0-dev-neostates` | cliente e servidor |
 
@@ -50,7 +50,7 @@ Isto não pôde ser verificado neste ambiente e fica com o dono do projeto:
 | Item | Motivo |
 |---|---|
 | Espalhar para os lados ao cair com 3 fontes vizinhas; parede no termo de queda | mexem no `BlockDynamicLiquid.updateTick`, que o Crucible reescreve |
-| `water_overlay` em vidro e folhas; verso do topo da água | desenho; pedem teste com shader |
+| Omitir o verso do topo da água sob teto todo sólido | o 1.7.10 sempre desenha o verso; tirar pede um corte por ordinal num método que o Angelica também transforma, por uma diferença quase invisível |
 | Opacidade 1 de um bloco com água | o gancho ficaria no caminho quente da luz e mexeria no mapa de altura durante a carga do chunk |
 | Cantos de escada na forma dos blocos | o 1.7.10 calcula o canto pelos vizinhos; tratados como escada reta |
 | Item boiando na lava | fica o do Et Futurum |

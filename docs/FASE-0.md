@@ -192,7 +192,9 @@ estruturas geradas dentro d'água devem nascer waterlogged; se o `waterSourceCon
 
 | 10 | entrega: build automático, histórico, [ENTREGA.md](ENTREGA.md); arrasto da flecha na água; pesca completa em água dentro de blocos |
 
-O que foi verificado até a Fase 10:
+| 11 | `water_overlay`: a lateral lisa da água contra vidro, gelo e folhas |
+
+O que foi verificado até a Fase 11:
 
 * build e 28 testes;
 * servidor de desenvolvimento (Forge, Java 21) sobe até `Done` com o mod;

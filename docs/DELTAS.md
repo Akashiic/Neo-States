@@ -125,8 +125,8 @@ qualquer fazenda que conte com mobs afundando. Por isso a proposta é jogador pr
 | G-5 | Forma da névoa | `GL_EXP` densidade `0.1` | linear `−8 .. 96 × visão` | `EntityViewRenderEvent.FogDensity` |
 | G-6 | Adaptação da visão | não existe | `waterVisionTime` (600 ticks) | contador no cliente |
 | G-7 | Névoa mais próxima | não existe | `× 0.85` em pântanos | tabela por bioma |
-| G-8 | `water_overlay` em vidro e folhas | não existe | sim | portar depois **[A VERIFICAR com o Angelica]** |
-| G-9 | Verso do topo | sempre uma face | `shouldRenderBackwardUpFace` | portar depois |
+| G-8 | `water_overlay` em vidro e folhas | a lateral encostada em vidro usa a textura de água corrente | usa `water_overlay`, um cinza liso (165, alfa 180), contra `HalfTransparentBlock` e folhas | portado na Fase 11 (`modernWaterOverlay`); visto com e sem Angelica |
+| G-9 | Verso do topo | **sempre desenhado** (o topo sai com os dois sentidos: 8 vértices) | só quando alguma das 9 células acima não é água nem bloco sólido (`shouldRenderBackwardUpFace`) | não portado: a diferença só aparece olhando de dentro d'água para um teto todo sólido, e tirar os 4 vértices pede um corte por ordinal num método que o Angelica também transforma. Até a Fase 10 esta linha dizia "sempre uma face", o que estava errado |
 | G-10 | FOV submerso | `× 60/70` | escalado por `fovEffectScale` | não portar |
 | G-11 | Luz dentro d'água | a água tira 3 de luz por bloco | tira 1 | portar: visto no teste do pack ([TESTES.md](TESTES.md)); o Hodgepodge já tem `useLighterWater` |
 
@@ -165,7 +165,7 @@ Player Backport), bolhas e itens flutuando (já são do Et Futurum).
 ### Estado (Fase 6)
 
 Portados e ligados por `modernWaterPhysics`: A-5, A-6, A-7, C-1, C-2, C-4, C-5, C-6, D-3, D-5, D-7. Portado e ligado
-por `modernWaterLight`: G-11. Continuam de fora: B-4, E-6, E-8 (além do caso hospedado), G-8, G-9.
+por `modernWaterLight`: G-11. Continuam de fora: B-4, E-6, E-8 (além do caso hospedado), G-9.
 
 G-11 tem duas partes. A opacidade muda o que é calculado dali em diante; a luz **guardada** nos chunks já gerados só
 muda onde um bloco muda, então um mundo antigo ficaria escuro debaixo d'água para sempre. Por isso cada chunk antigo
@@ -179,8 +179,8 @@ fontes, sobre bloco sólido ou fonte, o bloco enche.
 Na Fase 8 entrou o caso waterlogged de E-8: a água sai de um bloco que a contém só pelas faces que ele deixa abertas
 (`water/HolderShapes`, lido do metadata: laje, escada, alçapão, escada de mão). Só faces inteiras contam; duas faces
 parciais que juntas fechariam o quadrado e os cantos de escada não são considerados. E-6 (espalhar para os lados ao
-cair com 3 fontes vizinhas), B-4, G-8 e G-9 continuam de fora: os dois primeiros mexem no `BlockDynamicLiquid`, que o
-Crucible reescreve, e os dois últimos são de desenho e pedem teste com shader.
+cair com 3 fontes vizinhas) e B-4 continuam de fora: mexem no `BlockDynamicLiquid`, que o Crucible reescreve. G-8
+entrou na Fase 11; G-9 ficou de fora (ver a tabela G).
 
 O empurrão de um jogador depende de a física rodar no cliente (no 1.7.10 o cliente é quem move o jogador): a opção
 tem de ter o mesmo valor nos dois lados.

@@ -352,6 +352,19 @@ servidor).
 
 Não testado: carrinho andando por um trilho com água; o AkashicFishing por cima do Kunftig.
 
+## Fase 11: `water_overlay` (2026-11-12)
+
+Neo States `0.1.0-alpha.11`. Um aquário: água atrás de uma parede de vidro, com uma coluna de gelo e uma de folhas.
+
+| Verificação | Resultado |
+|---|---|
+| Sem Angelica (cliente de desenvolvimento), opção desligada e ligada | desligada: a água atrás do vidro tem as listras da textura corrente; ligada: lisa ([imagem](evidencias/fase-11/overlay-desligado-e-ligado.jpg)) |
+| Com Angelica (cliente do TEOF 5.4 contra o Crucible) | o cliente sobe com o mixin novo, sem falha de injeção; a água atrás do vidro sai lisa ([imagem](evidencias/fase-11/overlay-com-angelica.jpg)) |
+| Regra de onde a textura troca (teste unitário) | passou |
+
+Não testado: com shader; contra folhas e gelo de perto (estão na cena, mas a captura mostra o vidro); vidro de mods
+que não estendem `BlockBreakable` (ficam com a textura corrente).
+
 ## Não executado até aqui
 
 Das Fases 1 e 2:

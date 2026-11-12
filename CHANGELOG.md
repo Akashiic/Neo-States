@@ -3,6 +3,14 @@
 Versões de desenvolvimento, uma por fase. Nenhuma foi publicada como release; o registro dos testes de cada uma está
 em [docs/TESTES.md](docs/TESTES.md).
 
+## 0.1.0-alpha.11 (Fase 11)
+
+* `water_overlay` do 1.21.1: a lateral da água encostada em vidro, vidro colorido, gelo ou folhas é desenhada lisa,
+  sem a textura de água corrente (`visual.modernWaterOverlay`). Um resource pack pode trocar a textura em
+  `assets/neostates/textures/blocks/water_overlay.png`.
+* Correção de documentação: o 1.7.10 já desenha o verso da superfície da água; o que o 1.21.1 faz diferente é
+  omiti-lo sob um teto todo sólido.
+
 ## 0.1.0-alpha.10 (Fase 10)
 
 * Flecha na água guarda 0,6 do movimento por tick, como no 1.21.1 (era 0,8).

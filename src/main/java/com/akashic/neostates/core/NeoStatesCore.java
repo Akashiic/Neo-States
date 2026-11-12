@@ -55,6 +55,7 @@ public class NeoStatesCore implements IFMLLoadingPlugin, IEarlyMixinLoader {
                 mixins.add("client.MixinWorldRenderer_WaterPass");
             }
             mixins.add("client.MixinRenderBlocks_Water");
+            mixins.add("client.MixinRenderBlocks_Overlay");
             mixins.add("client.MixinBlockLiquid_WaterFaces");
         }
         return mixins;
