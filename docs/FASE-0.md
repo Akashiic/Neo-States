@@ -147,6 +147,16 @@ idêntico nas versões 2.2.37, 2.2.43 e 2.2.45.
 
 ## Decisões do dono
 
+**Respondidas na Fase 1.** O dono aceitou as cinco recomendações, com três ressalvas que valem sobre a tabela:
+
+| Tema | Decisão |
+|---|---|
+| Empurrão do fluido (linha 2) | mixin próprio, exatamente como no 1.21.1; não contar com o Et Futurum |
+| Gravidade e pulo na água (linha 3) | exatamente como no 1.21.1, sem restringir ao jogador |
+| Dependências (linha 5) | não depender do ChunkAPI nem de bibliotecas da FalsePattern ([ADR-0001, Revisão 1](adr/ADR-0001-armazenamento-waterlogging.md#revisão-1-sem-chunkapi)) |
+| Novo | empurrão entre entidades e entre jogadores como no 1.21.1 ([DELTAS.md, seção I](DELTAS.md#i-empurrão-entre-entidades-a-levantar)) |
+| Crucible | o trabalho no servidor entra quando chegar a hora; cliente e servidor carregam o mod |
+
 | # | Decisão | Opções | Recomendação |
 |---|---|---|---|
 | 1 | Waterlogging: FluidLogged ou implementação própria | depender, bifurcar (LGPL), escrever | escrever, com o formato de 1 bit |
@@ -157,6 +167,59 @@ idêntico nas versões 2.2.37, 2.2.43 e 2.2.45.
 
 Perguntas menores que travam detalhes: quais blocos de mods entram na lista padrão de "pode conter água"; se
 estruturas geradas dentro d'água devem nascer waterlogged; se o `waterSourceConversion` vira gamerule.
+
+## Estado
+
+| Fase | Estado |
+|---|---|
+| 0 | concluída |
+| 1 | esqueleto do mod, API de leitura, pipeline de altura, comando `/neostates sonda`, testes de impressão digital |
+| 2 | Camada A: textura em cinza gerada em tempo de execução, cor por bioma, névoa submersa (opções `modernWaterColor` e `modernWaterFog` em `config/neostates.cfg`) |
+
+| 3 | Camada C, dados: 1 bit por célula na seção, salvo pelos eventos de chunk do Forge e sincronizado por pacotes próprios; vale em Y < 0; API 2 (`isWaterlogged`, `setWaterlogged`) |
+
+| 4 | Camada C, comportamento: blocos que podem conter água, colocar, quebrar, balde, consultas de fluido do mundo e das entidades, câmera, espalhamento da fonte hospedada; API 3; `/neostates autoteste` |
+
+| 5 | Camada C, render: a água hospedada é desenhada pelo renderizador de líquidos vanilla no passe translúcido; a camada chega ao `ChunkCache` e às threads de meshing do Angelica |
+
+| 6 | Camada B: "na água", olhos e câmera pela superfície real; empurrão da correnteza, afundamento, regra do pulo e descida agachado do 1.21.1; luz da água; evento de fluxo do Bukkit; opções para desligar cada parte |
+
+| 7 | API 4 documentada ([API.md](API.md)) e usada pelo Player Backport e pelo Kunftig; luz da água refeita nos chunks antigos; opções do servidor seguidas pelo cliente; regra das duas fontes em blocos que contêm água; fluxo reagendado ao carregar o chunk |
+
+| 8 | fechamento: a água sai de um bloco só pelas faces abertas dele; pulo no raso corrigido para o jogador local; desenho sem Angelica e cor de pântano vistos; correnteza, pulo no raso e nado correndo medidos com jogador |
+
+| 9 | itens e orbes de experiência boiam; o ar volta aos poucos, com as bolhas na tela; trilhos contêm água e a corrente não os arranca |
+
+| 10 | entrega: build automático, histórico, [ENTREGA.md](ENTREGA.md); arrasto da flecha na água; pesca completa em água dentro de blocos |
+
+O que foi verificado até a Fase 10:
+
+* build e 28 testes;
+* servidor de desenvolvimento (Forge, Java 21) sobe até `Done` com o mod;
+* cliente de desenvolvimento (Java 8, sem tela, renderização por software) sobe até o menu: o mixin de `BlockLiquid`
+  aplica e os dois sprites em cinza carregam (16×512 e 32×1024, 32 quadros cada).
+
+* **pack real**: cliente TEOF 5.4 (Angelica 2.2.43, sem shaders) conectado ao Crucible do dono, com água e névoa
+  vistas dentro do mundo. Registro completo, achados e o que não foi executado em [TESTES.md](TESTES.md).
+
+* **Fase 3 no pack real**: água hospedada num baú, numa laje e numa laje em Y −5, persistindo a um reinício do
+  Crucible e chegando ao cliente.
+
+* **Fase 4 no pack real**: as 30 regras do autoteste passam no Crucible; jogador dentro de água hospedada conta como
+  na água e ganha a névoa.
+
+* **Fase 5 no pack real**: blocos com água desenhados no Angelica, dentro de um lago e no ar.
+
+* **Fase 6 no pack real**: 35 verificações do autoteste no Crucible; o contrato do Player Backport mantido.
+
+* **Fase 7 no pack real**: 40 verificações do autoteste; luz refeita em 529 chunks do mundo do servidor; afundar,
+  subir e descer medidos com um jogador; boia do Kunftig na superfície de água em lajes; fluxo barrado por plugin.
+
+* **Fase 8**: 46 verificações do autoteste no Crucible; ver [TESTES.md](TESTES.md).
+* **Fase 9**: 52 verificações no Crucible, com o Et Futurum e o Galacticraft; item boiando e barra de ar vistos no
+  cliente do pack.
+
+Continuam **[A VERIFICAR]**: o AkashicFishing em água hospedada, um plugin de proteção de verdade, shaders, biomas com cor própria, os plugins e o proxy.
 
 ## Ordem proposta
 

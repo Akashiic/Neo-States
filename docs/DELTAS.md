@@ -4,7 +4,14 @@ Cada linha compara o código lido dos dois lados ([VANILLA-1.7.10.md](VANILLA-1.
 [MODERN-1.21.1.md](MODERN-1.21.1.md)). A regra do projeto é a mesma do Akashic Player Backport: **só se porta um delta
 provado**. O que é algebricamente igual fica como está.
 
-Colunas: **Igual?** diz se o comportamento observável muda. **Decisão** é a proposta da Fase 0, a confirmar.
+Colunas: **Igual?** diz se o comportamento observável muda. **Decisão** é a proposta da Fase 0.
+
+**Decisões do dono na Fase 1** (valem sobre a coluna "Decisão" onde divergem):
+
+* C-4, C-5, C-6 (empurrão do fluido): **portar exatamente como no 1.21.1**, com código nosso, sem contar com o Et
+  Futurum.
+* D-3, D-5, D-7 (gravidade, pulo e descida na água): **fiéis ao 1.21.1**, para toda entidade viva, não só o jogador.
+* Empurrão **entre entidades** (seção I, nova): também fiel ao 1.21.1; ainda não levantado.
 
 ## A. Altura e geometria do fluido
 
@@ -121,6 +128,7 @@ qualquer fazenda que conte com mobs afundando. Por isso a proposta é jogador pr
 | G-8 | `water_overlay` em vidro e folhas | não existe | sim | portar depois **[A VERIFICAR com o Angelica]** |
 | G-9 | Verso do topo | sempre uma face | `shouldRenderBackwardUpFace` | portar depois |
 | G-10 | FOV submerso | `× 60/70` | escalado por `fovEffectScale` | não portar |
+| G-11 | Luz dentro d'água | a água tira 3 de luz por bloco | tira 1 | portar: visto no teste do pack ([TESTES.md](TESTES.md)); o Hodgepodge já tem `useLighterWater` |
 
 ## H. Coluna de bolhas
 
@@ -128,13 +136,77 @@ O Et Futurum Requiem já tem `BlockBubbleColumn` (padrão ligado), com soul sand
 é **não reimplementar** e só garantir que as costuras do Neo States tratam esse bloco como água. Comparar as constantes
 dele com as do 1.21.1 (tabela na seção 8 do documento moderno) fica **[A VERIFICAR]**.
 
+## I. Empurrão entre entidades (a levantar)
+
+Pedido do dono na Fase 1: colisão entre entidades e entre jogadores como no 1.21.1. É outro assunto que o empurrão do
+**fluido** (seção C): no 1.21.1 são `Entity.push(Entity)`, `LivingEntity.pushEntities` e a gamerule
+`maxEntityCramming`; no 1.7.10, `Entity.applyEntityCollision` e `EntityLivingBase.collideWithNearbyEntities`.
+
+Nada disso foi lido na Fase 0. Dois fatos já conhecidos condicionam o trabalho:
+
+* o Akashic Player Backport já tem um transformador em `Entity.applyEntityCollision` (`PlayerCollisionTransformer`) e
+  regras de colisão próprias (`CollisionPolicy`, `CollisionRuleSavedData`);
+* o Hodgepodge tira as caixas de entidade da colisão de `EntityItem` (`fastItemEntityPhysics`).
+
+Decisão do dono: isso mora no **Akashic Player Backport**; o Neo States pode se ligar a ele se precisar.
+**[A VERIFICAR]** os dois lados no decompilador, lá.
+
 ## Resumo: o que vale portar
 
 1. Unificar a leitura de altura (A-5, A-6, A-7, C-1, C-2).
 2. Waterlogging inteiro (F), com B-6, E-8 e E-9.
 3. Visual (G-1 a G-7).
 4. Gravidade e pulo na água do jogador (D-3, D-5, D-7), atrás de opção.
-5. Decidir com o dono: empurrão moderno (C-4 a C-6) contra o `adjustedLiquidPhysics` do Et Futurum; E-6.
+5. Empurrão do fluido como no 1.21.1 (C-4 a C-6), decidido na Fase 1. Falta decidir E-6.
 
 O que **não** se porta: o motor `FlowingFluid` inteiro, a tabela de níveis, o vetor de fluxo, o arraste (já é do
 Player Backport), bolhas e itens flutuando (já são do Et Futurum).
+
+### Estado (Fase 6)
+
+Portados e ligados por `modernWaterPhysics`: A-5, A-6, A-7, C-1, C-2, C-4, C-5, C-6, D-3, D-5, D-7. Portado e ligado
+por `modernWaterLight`: G-11. Continuam de fora: B-4, E-6, E-8 (além do caso hospedado), G-8, G-9.
+
+G-11 tem duas partes. A opacidade muda o que é calculado dali em diante; a luz **guardada** nos chunks já gerados só
+muda onde um bloco muda, então um mundo antigo ficaria escuro debaixo d'água para sempre. Por isso cada chunk antigo
+tem a luz da água refeita uma vez, ao carregar (`relightOldChunks`). Só clareia: desligar `modernWaterLight` depois
+não escurece o que já foi refeito. Um bloco com água (cerca, painel) não ganha a opacidade 1 que tem no 1.21.1: fica
+com a do próprio bloco; lajes e escadas do 1.7.10 já barram a luz inteira, com ou sem água.
+
+Na Fase 7 entrou a regra das fontes novas para blocos que contêm água (`FlowingFluid.getNewLiquid`): entre duas
+fontes, sobre bloco sólido ou fonte, o bloco enche.
+
+Na Fase 8 entrou o caso waterlogged de E-8: a água sai de um bloco que a contém só pelas faces que ele deixa abertas
+(`water/HolderShapes`, lido do metadata: laje, escada, alçapão, escada de mão). Só faces inteiras contam; duas faces
+parciais que juntas fechariam o quadrado e os cantos de escada não são considerados. E-6 (espalhar para os lados ao
+cair com 3 fontes vizinhas), B-4, G-8 e G-9 continuam de fora: os dois primeiros mexem no `BlockDynamicLiquid`, que o
+Crucible reescreve, e os dois últimos são de desenho e pedem teste com shader.
+
+O empurrão de um jogador depende de a física rodar no cliente (no 1.7.10 o cliente é quem move o jogador): a opção
+tem de ter o mesmo valor nos dois lados.
+
+### Fase 9: o que não é o jogador
+
+| # | Aspecto | 1.7.10 | 1.21.1 | Estado |
+|---|---|---|---|---|
+| I-1 | Item na água | afunda (gravidade 0,04 sempre) | com mais de 0,1 de água acima dos pés: sem gravidade, +0,0005 por tick até 0,06, 0,99 do movimento horizontal (`ItemEntity.setUnderwaterMovement`) | portado (`floatingItems`) |
+| I-2 | Item e "na água" | `EntityItem.handleWaterMovement` próprio: a caixa inteira, e nunca marca `inWater` | o mesmo de toda entidade | o item passa pela leitura do 1.21.1; `inWater` continua como no 1.7.10 |
+| I-3 | Orbe de experiência na água | afunda (0,03) | com os olhos na água: `min(v + 0,0005, 0,06)`, 0,99 horizontal | portado (`floatingItems`) |
+| I-4 | Ar fora d'água | volta a 300 de uma vez | +4 por tick; as bolhas ficam na tela enquanto volta | portado (`modernAirRecovery`) |
+| I-5 | Trilhos | a água corrente os arranca | aceitam uma fonte; a corrente não entra na célula | portado (com `waterlogging`) |
+| I-6 | Item na lava | queima | boia (0,95 horizontal) e queima, salvo os imunes | não portado; fica o do Et Futurum |
+| I-7 | Barco | física do 1.7.10 | reescrito no 1.9 | fora do escopo |
+| I-8 | Flecha na água | guarda 0,8 do movimento por tick | guarda 0,6 (`AbstractArrow.getWaterInertia`) | portado na Fase 10 (`modernWaterPhysics`) |
+
+Um item ou orbe parado sobe até 0,0005 × 0,98 ÷ 0,02 = 0,0245 bloco por tick.
+
+### Como o empurrão fiel convive com o Et Futurum
+
+O Et Futurum (`adjustedLiquidPhysics`, ligado por padrão) injeta **dentro** de `World.handleMaterialAcceleration`.
+Para o resultado ser exatamente o do 1.21.1, o Neo States não pode passar por esse método para a água: a detecção e o
+empurrão passam a ser calculados por código nosso a partir de `Entity.handleWaterMovement` (equivalente a
+`updateFluidHeightAndDoFluidPushing`). Com isso as injeções do Et Futurum na água ficam sem efeito, sem conflito de
+mixin; a parte dele que faz a **lava** empurrar continua valendo. Recomendação para o pack: desligar
+`adjustedLiquidPhysics` para não ter dois donos do mesmo comportamento.
+
+A impressão digital do Player Backport não é tocada: a gravidade troca a constante `0.02D`, não os três `0.8`.

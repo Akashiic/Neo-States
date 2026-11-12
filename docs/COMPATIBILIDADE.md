@@ -8,7 +8,11 @@ EndlessIDs 1.7.4, FluidLogged 0.2.0 (jars `-sources` dos Mavens da GTNH e da Fal
 e os repositórios BelowCore, Akashic Player Backport, Kunftig, YesSteveModel, VitaGenesis e AkashicFishing no estado
 desta sessão.
 
-**[A VERIFICAR]** a lista e as versões exatas do TEOF em produção. Os documentos dos outros repositórios citam números
+**Conferido no TEOF 5.4** (ver [TESTES.md](TESTES.md)): Angelica 2.2.43, Hodgepodge 2.7.219, Et Futurum Requiem
+2.6.64-GTNH, GTNHLib 0.11.54, ChunkAPI 0.8.4, EndlessIDs 1.7.4 com `extendBlockItem=true`; sem FluidLogged. Os mixins
+lidos aqui são os de Hodgepodge 2.7.189 e Et Futurum 2.6.59: **[A VERIFICAR]** o que mudou até as versões do pack.
+
+Nota antiga: Os documentos dos outros repositórios citam números
 diferentes (Angelica 2.2.37 e 2.2.43; Hodgepodge 2.7.189 e 2.7.219; Et Futurum 2.6.59 no servidor e 2.6.64 no cliente;
 GTNHLib 0.11.40 e 0.11.51; "TEOF 4.1" e "TEOF 5.3").
 
@@ -224,6 +228,19 @@ Nenhum mixin em `handleWaterMovement`, `isInWater`, `isInsideOfMaterial`, `handl
 
 No Crucible, toda entrada com `addExcludedMod(TargetedMod.BUKKIT)` fica desligada no servidor.
 
+### Itens que boiam
+
+O Et Futurum (`liquidItemFloat`, ligado no pack) tem a própria flutuação de itens: num gancho no início de
+`EntityItem.onUpdate`, com prioridade 1002, põe 0,05 fixo para cima e corta o movimento horizontal para 0,4, em
+qualquer líquido. Com `floatingItems` ligado e o item num bloco de água, o Neo States desfaz o que foi feito ao
+movimento entre dois ganchos seus no mesmo ponto: um de prioridade 1000, que roda antes do deles e anota o movimento,
+e um de prioridade 1100, que roda depois e o devolve (de dois ganchos no início de um método, roda depois o do mixin
+de prioridade maior; medido, não suposto). Um gancho de outro mod com prioridade entre 1000 e 1100 no mesmo ponto
+seria desfeito junto. O autoteste mede os três primeiros ticks de um item na água e falha se algo somar.
+
+A opção `useLighterWater` do Hodgepodge faz o mesmo que `modernWaterLight` (opacidade 1). Com qualquer uma das duas
+ligada, a migração de luz dos chunks antigos (`relightOldChunks`) vale.
+
 ## Et Futurum Requiem
 
 O mod que mais sobrepõe o escopo do Neo States.
@@ -249,6 +266,13 @@ Blocos dele que são waterloggable no 1.21.1: `BaseSlab`, `BaseStairs`, `BaseWal
 `BlockIronTrapdoor`, `BlockCopperTrapdoor`, `BlockWoodFence`, `BlockModernWoodFence`, `BlockWoodFenceGate`,
 `BlockChain`, `BlockLightningRod`, `BlockMangroveRoots`, `BlockBarrier`, `BlockLight`, `BlockLantern`,
 `BlockPointedDripstone`, `BlockAmethystCluster`, `BlockGlowLichen`, `BlockWoodSign`, `BlockCopperGrate`.
+
+## Galacticraft
+
+Modifica a constante da gravidade em `EntityItem.onUpdate` (`0.03999999910593033D`, para a gravidade dos planetas).
+Uma constante aceita um modificador só: um segundo `@ModifyConstant` falha na inicialização, e foi assim que isso
+apareceu (o servidor recusou subir, falha fechada). A flutuação do item não toca na constante: anota o movimento
+vertical depois do `super.onUpdate()` e embrulha a chamada de `moveEntity`.
 
 ## GTNHLib
 
@@ -287,6 +311,21 @@ Crucible, ou a proteção fura.
 
 O `PlayerContainerFix` do TEOF deixa `org.bukkit.World` com tipos ofuscados (nota do AkashicFishing): nada de
 `getMethod` em classes Bukkit.
+
+### Bytecode de verdade
+
+As classes do Minecraft no `server.jar` do Crucible são geradas na inicialização (`binpatches.pack.lzma`), e o que
+roda inclui os mixins e coremods de todos os mods. Para ler o que existe de fato: subir o servidor com
+`-Dmixin.debug.export=true` e desmontar `.mixin.out/class/...` com `javap -p -c`. Conferido assim na Fase 9:
+`EntityItem.onUpdate` (ganchos do Et Futurum, BugTorch, Galacticraft, DragonAPI, World Firewall e MysteriumLib),
+`EntityItem.handleWaterMovement`, `EntityLivingBase.onEntityUpdate` (três `setAir`, o terceiro com `maxAirTicks`) e
+`BlockDynamicLiquid.func_149807_p`.
+
+### Luz
+
+O `World.updateLightByType` do Crucible pode rodar numa thread própria (`use-async-lighting` do `spigot.yml`, herdado
+do PaperSpigot). A migração de luz do Neo States não passa por ele: escreve os arrays de luz das seções na thread do
+mundo e manda a luz nova aos clientes num pacote próprio (`MessageLight`), sem reenviar o chunk.
 
 ## Velocity + ProtocolObelisk
 

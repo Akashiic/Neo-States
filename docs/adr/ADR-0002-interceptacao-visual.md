@@ -75,8 +75,12 @@ Medido nos jars: a textura do 1.7.10 é azul (`#2F43F4`) com alfa variando de 16
    de poção (`GrayscaleWaterResourcePack`), o que mostra que ela convive com o pack.
 2. Um resource pack opcional do modpack com arte própria.
 
-`BlockLiquid.getIcon` passa a devolver os sprites em cinza para `Material.water` (um `@Inject` cancelável em
-`getIcon(II)`, ou a troca do array privado `field_149806_a` depois do stitch). **[A VERIFICAR]** a interação com o
+`BlockLiquid.getIcon` passa a devolver os sprites em cinza para `Material.water`.
+
+**Implementado na Fase 2** assim: `@Inject` cancelável em `BlockLiquid.getIcon(II)`. O array privado
+`field_149806_a` fica com os ícones azuis de propósito: `BlockLiquid.getLiquidIcon` (caldeirão, o fluido "water" do
+Forge em tanques de mods) não é tingido por bioma e ficaria cinza. O alfa da textura original é mantido (a média do
+1.7.10 é 179; a moderna é 180 fixo), e uma textura que já é cinza no resource pack não é alterada. **[A VERIFICAR]** a interação com o
 `BlockIconTransformer` do GTNHLib, que insere um retorno antecipado em todo `getIcon`.
 
 Quem mais desenha com o ícone da água: o caldeirão, itens de balde em tanques de mods, a coluna de bolhas do Et
@@ -142,6 +146,19 @@ não usa: sob o Angelica 2.2.43 o fluido de um bloco fluidlogged não é desenha
   tratar os vértices como água.
 * A face lateral da água fica recuada `0.001` (comportamento do `renderBlockLiquid`), então a parte coberta pela
   laje fica atrás dela. Não há formas de oclusão no 1.7.10; aceitar esse resultado na primeira versão.
+
+**Implementado na Fase 5**, com dois ajustes em relação ao texto acima, vindos do teste no pack
+([TESTES.md](../TESTES.md)):
+
+* o gancho de `WorldRenderer.updateRenderer` não usa a posição: todo bloco que **pode** conter água pede o passe 1
+  (custa rodar o passe translúcido em seções com lajes ou cercas, só no vanilla). E ele só é carregado sem o Angelica,
+  que reescreve essa mesma chamada;
+* a face da água contra um vizinho com água é resolvida ajustando o **resultado** de
+  `BlockLiquid.shouldSideBeRendered`, não a leitura de bloco dentro dele.
+
+**Dado na thread de meshing (implementado).** Além do acesso ao `WorldSlice`, foi preciso um segundo mixin tardio,
+em `ExtendedBlockStorageExt.copyFrom`: sem o ChunkAPI como dono do dado, a cópia de seção do Angelica não leva o campo
+sozinha. O texto original:
 
 **Dado na thread de meshing.** A cópia da seção já traz a camada (o Angelica clona pelo ChunkAPI). Falta alcançá-la a
 partir do `IBlockAccess`: o `WorldSlice` guarda as cópias num array privado. É preciso um mixin tardio de **acesso**

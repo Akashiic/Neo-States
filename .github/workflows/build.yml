@@ -1,0 +1,62 @@
+# Builds the mod with its unit tests and publishes the jars as artifacts of the run: the mod itself and the API jar
+# other mods may compile against.
+name: Build
+
+on:
+  push:
+    branches: [ main, 'claude/**' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  BASE_VERSION: 0.1.0-alpha.10
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Java 8 runs Minecraft, 17/21 compile, 25 runs the Gradle daemon
+      - uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: |
+            8
+            17
+            21
+            25
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Version
+        run: echo "VERSION=${BASE_VERSION}-${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+
+      - name: Build (spotless, unit tests)
+        run: >-
+          ./gradlew spotlessCheck build -x javadoc --no-daemon
+          -Porg.gradle.java.installations.fromEnv=JAVA_HOME_8_X64,JAVA_HOME_17_X64,JAVA_HOME_21_X64,JAVA_HOME_25_X64
+
+      - name: Mod jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: NeoStates-${{ env.VERSION }}
+          path: build/libs/NeoStates-${{ env.VERSION }}.jar
+          if-no-files-found: error
+
+      - name: API jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: NeoStates-${{ env.VERSION }}-api
+          path: build/libs/NeoStates-${{ env.VERSION }}-api.jar
+          if-no-files-found: error
