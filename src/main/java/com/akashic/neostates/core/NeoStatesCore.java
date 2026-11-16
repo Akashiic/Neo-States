@@ -49,8 +49,8 @@ public class NeoStatesCore implements IFMLLoadingPlugin, IEarlyMixinLoader {
             mixins.add("client.MixinBlockLiquid_GrayIcon");
             mixins.add("client.MixinActiveRenderInfo_Water");
             mixins.add("client.MixinBlock_WaterPass");
-            // Vanilla's chunk renderer. Angelica replaces it (and rewrites the very call this mixin wraps), so the
-            // mixin is for the game without Angelica only.
+            // Vanilla's chunk renderer (also as rewritten by DragonAPI). Angelica replaces it (and rewrites the very
+            // call this mixin wraps), so the mixin is for the game without Angelica only.
             if (!present("com/gtnewhorizons/angelica/AngelicaMod.class")) {
                 mixins.add("client.MixinWorldRenderer_WaterPass");
             }

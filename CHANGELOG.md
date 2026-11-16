@@ -3,6 +3,12 @@
 Versões de desenvolvimento, uma por fase. Nenhuma foi publicada como release; o registro dos testes de cada uma está
 em [docs/TESTES.md](docs/TESTES.md).
 
+## 0.1.0-alpha.11
+
+* Correção: sem o Angelica, o jogo não abria quando o DragonAPI estava instalado. O DragonAPI troca a chamada que o
+  NeoStates usa no renderizador de chunks pelo gancho dele; agora as duas formas são reconhecidas e a água continua
+  aparecendo do mesmo jeito. Com o Angelica nada muda.
+
 ## 0.1.0-alpha.10 (Fase 10)
 
 * Flecha na água guarda 0,6 do movimento por tick, como no 1.21.1 (era 0,8).
