@@ -55,6 +55,9 @@ public class NeoStatesCore implements IFMLLoadingPlugin, IEarlyMixinLoader {
                 mixins.add("client.MixinWorldRenderer_WaterPass");
             }
             mixins.add("client.MixinRenderBlocks_Water");
+            // The window in which the grey sprite is the right one: only the liquid renderer multiplies it by the
+            // biome colour. Everything else drawing water (a GUI, WAILA/WDMla, NEI, an item preview) gets the blue.
+            mixins.add("client.MixinRenderBlocks_TintScope");
             mixins.add("client.MixinBlockLiquid_WaterFaces");
         }
         return mixins;

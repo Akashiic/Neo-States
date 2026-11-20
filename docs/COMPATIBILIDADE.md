@@ -33,6 +33,10 @@ GTNHLib 0.11.40 e 0.11.51; "TEOF 4.1" e "TEOF 5.3").
    reescreve o corpo.
 8. Preferir `@WrapOperation` e `@ModifyExpressionValue` (MixinExtras) a `@Redirect` e `@Overwrite`, para encadear com
    os outros mods.
+9. **Nunca** usar `ForgeHooksClient.getWorldRenderPass()` como resposta a "estou desenhando o mundo?": além de o
+   FalseTweaks reescrever esse método, o Beddium não passa pelo `WorldRenderer.updateRenderer`, que é quem mantém o
+   campo. Para saber se a cor do bioma vai ser aplicada, o critério é estar dentro de `RenderBlocks.renderBlockLiquid`
+   (`BiomeTintScope`).
 
 ## BelowCore
 
@@ -342,3 +346,10 @@ isso já atravessa o proxy hoje (EndlessIDs). A camada do Neo States viaja dentr
 * **Biomes O' Plenty**: o Angelica, o Hodgepodge e o GTNHLib têm mixins tardios no `FogHandler` dele.
   **[A VERIFICAR]** se está no TEOF e como o handler de névoa dele convive com o nosso.
 * **Fluidos do Forge** (`BlockFluidClassic`, `BlockFluidFinite`): fora do escopo da água vanilla; ficam como estão.
+* **FalseTweaks 4.4.5**: `@Overwrite` em `ForgeHooksClient.getWorldRenderPass` — na thread principal devolve o campo do
+  Forge (que só o `WorldRenderer.updateRenderer` mantém), nas threads de meshing uma cópia própria por tarefa. Também
+  tem `ForgeHooksClientMixin` e as tarefas de meshing do Beddium (`FTChunkBuilderMeshingTask`).
+* **Beddium 1.2.5**: substitui o `WorldRenderer` pelo `SimpleChunkBuilderMeshingTask`, que marca o passe do Forge por
+  tarefa; o meshing continua chamando `RenderBlocks.renderBlockByRenderType`. Consequência para o Neo States: o passe lido
+  na thread principal não é -1 depois do mundo, então qualquer decisão "mundo × interface" tirada dele vaza cinza para a
+  GUI (foi a issue #2). A janela `BiomeTintScope` não depende dele.

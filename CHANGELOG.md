@@ -3,6 +3,14 @@
 Versões de desenvolvimento, uma por fase. Nenhuma foi publicada como release; o registro dos testes de cada uma está
 em [docs/TESTES.md](docs/TESTES.md).
 
+## Não lançado (correção do ícone da água no WDMla)
+
+* O ícone da água volta a sair azul em quem desenha o ícone **fora** do mundo: tooltip do WAILA/WDMla, NEI, prévia de
+  item. A textura em cinza só vale agora dentro de `RenderBlocks.renderBlockLiquid`, o único lugar do cliente que
+  multiplica o sprite pela cor do bioma. Antes o teste era o passe de render do Forge, que no pack não responde
+  "não há passe rodando" na interface: o FalseTweaks reescreve `ForgeHooksClient.getWorldRenderPass` e o Beddium faz o
+  meshing fora da thread principal (issue #2: "o ícone da água no WDMla sai cinza").
+
 ## 0.1.0-alpha.10 (Fase 10)
 
 * Flecha na água guarda 0,6 do movimento por tick, como no 1.21.1 (era 0,8).
