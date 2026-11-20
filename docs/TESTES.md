@@ -352,6 +352,20 @@ servidor).
 
 Não testado: carrinho andando por um trilho com água; o AkashicFishing por cima do Kunftig.
 
+## Correção do ícone cinza no WDMla (2026-11-20)
+
+Relato do jogador ([issue #2](https://github.com/Akashiic/Neo-States/issues/2)): com o pack dele, o ícone da água no
+tooltip do WDMla sai cinza claro em vez de azul. O pack do relato tem Beddium 1.2.5 e FalseTweaks 4.4.5 (sem Angelica);
+o teste em jogo foi feito nele, numa build da `alpha.11` com este commit.
+
+| Verificação | Resultado |
+|---|---|
+| Causa | o teste do ícone cinza era `ForgeHooksClient.getWorldRenderPass() >= 0`; o FalseTweaks `@Overwrite`s `getWorldRenderPass` e o Beddium mesha fora do `WorldRenderer`, então na interface o valor não é -1 |
+| Correção | o cinza vale só dentro de `RenderBlocks.renderBlockLiquid`, onde a cor do bioma é aplicada (`BiomeTintScope`, `MixinRenderBlocks_TintScope`, `@WrapMethod` com `finally`) |
+| Janela de tingimento (teste unitário, 6 casos: fechada por padrão, abre e fecha, aninhada, com exceção, `end` sem `begin`, por thread) | passou |
+| `spotlessApply build` (compilação + testes + mixins) | passou |
+| Em jogo, no pack do relato (Beddium 1.2.5 + FalseTweaks 4.4.5) | **passou** (2026-11-20, com a `alpha.11` + este commit, num jar de teste): o ícone do tooltip do WDMla volta a sair azul com a textura animada da água, e a água do mundo continua com a cor do bioma |
+
 ## Não executado até aqui
 
 Das Fases 1 e 2:

@@ -77,7 +77,13 @@ Medido nos jars: a textura do 1.7.10 é azul (`#2F43F4`) com alfa variando de 16
 
 `BlockLiquid.getIcon` passa a devolver os sprites em cinza para `Material.water`.
 
-**Implementado na Fase 2** assim: `@Inject` cancelável em `BlockLiquid.getIcon(II)`. O array privado
+**Implementado na Fase 2** assim: `@Inject` cancelável em `BlockLiquid.getIcon(II)`, devolvendo o sprite em cinza
+**apenas dentro de `RenderBlocks.renderBlockLiquid`** (`BiomeTintScope`, `MixinRenderBlocks_TintScope`): é o único
+ponto do cliente que pede o ícone e o multiplica pela cor de `BlockLiquid.colorMultiplier`. Fora dele — GUI, tooltip do
+WAILA/WDMla, NEI, prévia de item, desenho plano — o ícone azul é o certo, porque não há cor para completar o cinza. A
+Fase 6 tentou esse teste pelo passe de render do Forge (`ForgeHooksClient.getWorldRenderPass() >= 0`) e ele não vale no
+pack: o FalseTweaks reescreve `getWorldRenderPass` e o Beddium faz o meshing em outras threads, então a interface
+recebia o ícone cinza (issue #2). O array privado
 `field_149806_a` fica com os ícones azuis de propósito: `BlockLiquid.getLiquidIcon` (caldeirão, o fluido "water" do
 Forge em tanques de mods) não é tingido por bioma e ficaria cinza. O alfa da textura original é mantido (a média do
 1.7.10 é 179; a moderna é 180 fixo), e uma textura que já é cinza no resource pack não é alterada. **[A VERIFICAR]** a interação com o
